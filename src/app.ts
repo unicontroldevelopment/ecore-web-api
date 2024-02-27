@@ -1,11 +1,24 @@
-import express, { Application } from "express";
+import cors from "cors";
+import express from "express";
+import http from "http";
+import routes from "./router";
 
-const app: Application = express();
+/* eslint no-console: "off" */
 
-const port = process.env.PORT || 3000;
+require("dotenv/config");
 
+const app = express();
+const server = http.createServer(app);
+
+app.use(cors());
 app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Listening to requests on port ${port}`);
-});
+app.use(routes);
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () =>
+  console.log(`Server running at http://localhost:${PORT}`)
+);
+
+export default app;
