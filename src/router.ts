@@ -1,11 +1,11 @@
 import { Router } from "express";
-import UserController from "./controllers/UserController";
+import EmployeeController from "./controllers/EmployeeController";
 import authMiddlewares from "./middlewares/auth";
 
 const routes = Router();
 
-routes.post("/login", UserController.login);
-routes.post("/user", UserController.create);
+routes.post("/login", EmployeeController.login);
+routes.post("/user", EmployeeController.create);
 
 routes.use(authMiddlewares);
 

@@ -1,21 +1,22 @@
-import bcryptjs from "bcryptjs";
 import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import prisma from "../database/prisma";
-import UserService from "../services/UserService";
+import EmployeeService from "../services/EmployeeService";
 
-class UserController {
+class EmployeeController {
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
 
-      const user = await prisma.users.findUnique({ where: { email: email } });
+      const user = await prisma.employees.findUnique({
+        where: { email: email },
+      });
 
       if (!user) {
         return res.status(500).json({ message: "Usuário não encontrado!" });
       }
 
-      if (!(await bcryptjs.compare(password, user.password))) {
+      if (password !== user.password) {
         return res.status(422).json({ message: "Senha inválida!" });
       }
 
@@ -25,7 +26,7 @@ class UserController {
 
       const { id } = userLogin;
 
-      const loggedUser = await UserService.getById(id);
+      const loggedUser = await EmployeeService.getById(id);
 
       return res.status(200).json({ user: loggedUser, token });
     } catch (error) {
@@ -36,7 +37,7 @@ class UserController {
   async create(req: Request, res: Response) {
     try {
       const { name, email, password, passwordConfirmation, role } = req.body;
-      const user = await UserService.create(
+      const user = await EmployeeService.create(
         name,
         email,
         password,
@@ -54,4 +55,4 @@ class UserController {
   }
 }
 
-export default new UserController();
+export default new EmployeeController();

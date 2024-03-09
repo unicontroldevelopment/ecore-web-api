@@ -1,9 +1,8 @@
-import { hash } from "bcryptjs";
 import prisma from "../database/prisma";
 
-class UserService {
+class EmployeeService {
   async getById(id: number) {
-    const user = await prisma.users.findUnique({
+    const user = await prisma.employees.findUnique({
       where: { id },
     });
 
@@ -20,7 +19,7 @@ class UserService {
       throw new Error("Senhas não conferem!");
     }
 
-    const userAlreadyExists = await prisma.users.findUnique({
+    const userAlreadyExists = await prisma.employees.findUnique({
       where: { email },
     });
 
@@ -28,13 +27,11 @@ class UserService {
       throw new Error("Usuário já existe!");
     }
 
-    const passwordHash = await hash(password, 8);
-
-    const user = await prisma.users.create({
+    const user = await prisma.employees.create({
       data: {
         name,
         email,
-        password: passwordHash,
+        password,
         role,
       },
     });
@@ -43,4 +40,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new EmployeeService();
