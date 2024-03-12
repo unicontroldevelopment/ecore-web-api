@@ -10,14 +10,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name     String
-  role     String
-  password String
-  created  DateTime @default(now())
-  updated  DateTime @updatedAt
+model Employees {
+  id                Int      @id @default(autoincrement())
+  name              String
+  role              String
+  password          String
+  department        String?
+  company           String?
+  unit              String?
+  networkUser       String?
+  networkPassword   String?
+  email             String @unique
+  emailPassword     String?
+  discordEmail      String?
+  discordPassword   String?
+  notebookBrand     String?
+  notebookName      String?
+  notebookProperty  String?
+  coolerProperty    String?
+  officeVersion     String?
+  windowsVersion    String?
+  created           DateTime @default(now())
+  updated           DateTime @updatedAt
 
-  @@map("users")
+  ServerAccess ServerAccess[]
+
+  @@map("employees")
+}
+
+model ServerAccess {
+  id                Int     @id @default(autoincrement())
+  fitolog           Boolean
+  commercial        Boolean
+  administrative    Boolean
+  humanResources    Boolean
+  technician        Boolean
+  newsis            Boolean
+  marketing         Boolean
+  projects          Boolean
+  managementControl Boolean
+  trainings         Boolean
+  it                Boolean
+  temp              Boolean
+  franchises        Boolean
+  created           DateTime @default(now())
+  updated           DateTime @updatedAt
+  employeeId        Int
+  Employees         Employees @relation(fields: [employeeId], references: [id])
+
+  @@map("serverAccess")
 }

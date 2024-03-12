@@ -25,7 +25,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = verify(token, process.env.JWT_KEY ?? "") as JwtPayload;
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.employees.findUnique({
       where: { id },
     });
 
