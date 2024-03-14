@@ -36,13 +36,48 @@ class EmployeeController {
   }
   async create(req: Request, res: Response) {
     try {
-      const { name, email, password, passwordConfirmation, role } = req.body;
-      const user = await EmployeeService.create(
+      const {
+        role,
         name,
-        email,
         password,
         passwordConfirmation,
-        role
+        department,
+        company,
+        unit,
+        networkUser,
+        networkPassword,
+        email,
+        emailPassword,
+        discordEmail,
+        discordPassword,
+        notebookBrand,
+        notebookName,
+        notebookProperty,
+        coolerProperty,
+        officeVersion,
+        windowsVersion,
+      } = req.body;
+      
+      const user = await EmployeeService.create(
+        role,
+        name,
+        password,
+        passwordConfirmation,
+        department,
+        company,
+        unit,
+        networkUser,
+        networkPassword,
+        email,
+        emailPassword,
+        discordEmail,
+        discordPassword,
+        notebookBrand,
+        notebookName,
+        notebookProperty,
+        coolerProperty,
+        officeVersion,
+        windowsVersion
       );
 
       return res

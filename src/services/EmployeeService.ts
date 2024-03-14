@@ -9,11 +9,25 @@ class EmployeeService {
     return user;
   }
   async create(
+    role: string,
     name: string,
-    email: string,
     password: string,
     passwordConfirmation: string,
-    role: string
+    department: string,
+    company: string,
+    unit: string,
+    networkUser: string,
+    networkPassword: string,
+    email: string,
+    emailPassword: string,
+    discordEmail: string,
+    discordPassword: string,
+    notebookBrand: string,
+    notebookName: string,
+    notebookProperty: string,
+    coolerProperty: string,
+    officeVersion: string,
+    windowsVersion: string
   ) {
     if (password !== passwordConfirmation) {
       throw new Error("Senhas não conferem!");
@@ -29,10 +43,24 @@ class EmployeeService {
 
     const user = await prisma.employees.create({
       data: {
-        name,
-        email,
-        password,
         role,
+        name,
+        password,
+        department,
+        company,
+        unit,
+        networkUser,
+        networkPassword,
+        email,
+        emailPassword,
+        discordEmail,
+        discordPassword,
+        notebookBrand,
+        notebookName,
+        notebookProperty,
+        coolerProperty,
+        officeVersion,
+        windowsVersion,      
       },
     });
 
