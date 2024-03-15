@@ -6,6 +6,8 @@ const routes = Router();
 
 routes.post("/login", EmployeeController.login);
 routes.post("/user", EmployeeController.create);
+routes.get("/employee/:id", EmployeeController.getById);
+routes.delete("/employee/:id", EmployeeController.delete);
 
 routes.use(authMiddlewares);
 

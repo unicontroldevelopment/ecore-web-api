@@ -8,6 +8,7 @@ class EmployeeService {
 
     return user;
   }
+
   async create(
     role: string,
     name: string,
@@ -65,6 +66,12 @@ class EmployeeService {
     });
 
     return user;
+  }
+
+  async deleteUser(id: number) {
+    await prisma.employees.delete({
+      where: { id },
+    });
   }
 }
 

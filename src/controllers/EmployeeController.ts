@@ -34,6 +34,7 @@ class EmployeeController {
       return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
+
   async create(req: Request, res: Response) {
     try {
       const {
@@ -88,6 +89,51 @@ class EmployeeController {
       return res.status(500).json({ message: error });
     }
   }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Usuário não encontrado!" });
+      }
+
+      const user = await EmployeeService.getById(userId);
+
+      return res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+    }
+
+    async delete(req: Request, res: Response) {
+      console.log('delete');
+      
+      try {
+        const userId = parseInt(req.params.id);
+        
+        const existedUser = await prisma.employees.findUnique({
+          where: { id: userId },
+        });
+  
+        if (!existedUser) {
+          return res.status(500).json({ message: "Usuário não encontrado!" });
+        }
+  
+        const user = await EmployeeService.deleteUser(userId);
+        console.log(user);
+        
+        return res.status(204).json();
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server Internal Error", error });
+      }
+    }
 }
 
 export default new EmployeeController();
