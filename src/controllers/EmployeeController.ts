@@ -104,7 +104,7 @@ class EmployeeController {
 
       const user = await EmployeeService.getById(userId);
 
-      return res.status(200).json(user);
+      return res.status(200).json({user, message: "Usuário encontrado."});
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -112,8 +112,6 @@ class EmployeeController {
     }
 
     async delete(req: Request, res: Response) {
-      console.log('delete');
-      
       try {
         const userId = parseInt(req.params.id);
         
@@ -125,13 +123,52 @@ class EmployeeController {
           return res.status(500).json({ message: "Usuário não encontrado!" });
         }
   
-        const user = await EmployeeService.deleteUser(userId);
-        console.log(user);
-        
-        return res.status(204).json();
+        const user = await EmployeeService.delete(userId);
+
+        return res.status(200).json({user,  message: "Usuário deletado com sucesso!"});
+
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server Internal Error", error });
+      }
+    }
+
+    async update(req: Request, res: Response){
+      try {
+        const userId = parseInt(req.params.id);
+      
+        const existedUser = await prisma.employees.findUnique({
+          where: { id: userId },
+        });
+  
+        if (!existedUser) {
+          return res.status(500).json({ message: "Usuário não encontrado!" });
+        }
+  
+        const updateData = await req.body;
+        
+        const updatedUser = await EmployeeService.update(userId, updateData);
+  
+        return res.status(200).json({updatedUser, message: "Usuário atualizado com sucesso!"});
+
+      } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: "Server Internal Error", error})
+      }
+    }
+
+    async getAllUsers(req: Request, res: Response) {
+      try {
+        const listUsers = await EmployeeService.getAllUsers()
+
+        if(!listUsers) {
+          return res.status(500).json({ message: "Não há usuários!" });
+        }
+
+        return res.status(200).json({listUsers,  message: "Usuários listados com sucesso!"});
+      } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: "Server Internal Error", error})
       }
     }
 }
