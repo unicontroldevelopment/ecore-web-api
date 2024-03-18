@@ -31,7 +31,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     if (user) {
       const { password: _, ...loggedUser } = user;
-      req.user = loggedUser;
       return next();
     }
   } catch (err) {
