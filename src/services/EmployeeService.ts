@@ -1,5 +1,7 @@
+import { Employees } from "@prisma/client";
 import prisma from "../database/prisma";
 
+type EmployeeUpdateInput = Partial<Omit<Employees, 'id' | 'created' | 'updated'>>;
 class EmployeeService {
   async getById(id: number) {
     const user = await prisma.employees.findUnique({
@@ -8,6 +10,7 @@ class EmployeeService {
 
     return user;
   }
+
   async create(
     role: string,
     name: string,
@@ -65,6 +68,31 @@ class EmployeeService {
     });
 
     return user;
+  }
+
+  async delete(id: number) {
+    const user = await prisma.employees.delete({
+      where: { id },
+    });
+
+    return user;
+  }
+
+  async update(id: number, updateData: EmployeeUpdateInput) {
+    const user = await prisma.employees.update({
+      where: {
+        id: id,
+      },
+      data: updateData,
+    })
+
+    return user;
+  }
+
+  async getAllUsers() {
+    const users = await prisma.employees.findMany()
+
+    return users;
   }
 }
 

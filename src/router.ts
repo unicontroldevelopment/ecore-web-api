@@ -1,12 +1,15 @@
 import { Router } from "express";
 import EmployeeController from "./controllers/EmployeeController";
-import authMiddlewares from "./middlewares/auth";
 
 const routes = Router();
 
 routes.post("/login", EmployeeController.login);
 routes.post("/user", EmployeeController.create);
+routes.get("/list", EmployeeController.getAllUsers);
+routes.get("/employee/:id", EmployeeController.getById);
+routes.delete("/employee/:id", EmployeeController.delete);
+routes.put("/employee/:id", EmployeeController.update)
 
-routes.use(authMiddlewares);
+//routes.use(authMiddlewares);
 
 export default routes;
