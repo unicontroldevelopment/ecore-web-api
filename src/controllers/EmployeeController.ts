@@ -148,6 +148,8 @@ class EmployeeController {
         const updateData = await req.body;
         
         const updatedUser = await EmployeeService.update(userId, updateData);
+        console.log(updatedUser);
+        
   
         return res.status(200).json({updatedUser, message: "Usuário atualizado com sucesso!"});
 
