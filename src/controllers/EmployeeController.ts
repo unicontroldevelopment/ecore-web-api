@@ -13,7 +13,7 @@ class EmployeeController {
       });
 
       if (!user) {
-        return res.status(500).json({ message: "Usuário não encontrado!" });
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
 
       if (password !== user.password) {
@@ -58,7 +58,7 @@ class EmployeeController {
         officeVersion,
         windowsVersion,
       } = req.body;
-      
+
       const user = await EmployeeService.create(
         role,
         name,
@@ -83,7 +83,7 @@ class EmployeeController {
 
       return res
         .status(201)
-        .json({ user, message: "Usuário criado com sucesso!" });
+        .json({ user, message: "Funcionário criado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error });
@@ -93,85 +93,96 @@ class EmployeeController {
   async getById(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id);
-      
+
       const existedUser = await prisma.employees.findUnique({
         where: { id: userId },
       });
 
       if (!existedUser) {
-        return res.status(500).json({ message: "Usuário não encontrado!" });
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
 
       const user = await EmployeeService.getById(userId);
 
-      return res.status(200).json({user, message: "Usuário encontrado."});
+      return res.status(200).json({ user, message: "Funcionário encontrado." });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
     }
-    }
+  }
 
-    async delete(req: Request, res: Response) {
-      try {
-        const userId = parseInt(req.params.id);
-        
-        const existedUser = await prisma.employees.findUnique({
-          where: { id: userId },
-        });
-  
-        if (!existedUser) {
-          return res.status(500).json({ message: "Usuário não encontrado!" });
-        }
-  
-        const user = await EmployeeService.delete(userId);
+  async delete(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
 
-        return res.status(200).json({user,  message: "Usuário deletado com sucesso!"});
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
 
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server Internal Error", error });
+      if (!existedUser) {
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
+
+      const user = await EmployeeService.delete(userId);
+
+      return res
+        .status(200)
+        .json({ user, message: "Funcionário deletado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
     }
+  }
 
-    async update(req: Request, res: Response){
-      try {
-        const userId = parseInt(req.params.id);
-      
-        const existedUser = await prisma.employees.findUnique({
-          where: { id: userId },
-        });
-  
-        if (!existedUser) {
-          return res.status(500).json({ message: "Usuário não encontrado!" });
-        }
-  
-        const updateData = await req.body;
-        
-        const updatedUser = await EmployeeService.update(userId, updateData);
-        
-  
-        return res.status(200).json({updatedUser, message: "Usuário atualizado com sucesso!"});
+  async update(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
 
-      } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Server Internal Error", error})
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
+
+      const updateData = await req.body;
+
+      const updatedUser = await EmployeeService.update(userId, updateData);
+
+      return res
+        .status(200)
+        .json({ updatedUser, message: "Funcionário atualizado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
     }
+  }
 
-    async getAllUsers(req: Request, res: Response) {
-      try {
-        const listUsers = await EmployeeService.getAllUsers()
+  async getAll(req: Request, res: Response) {
+    try {
+      const { role, name, department, company, unit } = req.query;
 
-        if(!listUsers) {
-          return res.status(500).json({ message: "Não há usuários!" });
-        }
+      const listUsers = await EmployeeService.getAll(
+        role?.toString(),
+        name?.toString(),
+        department?.toString(),
+        company?.toString(),
+        unit?.toString()
+      );
 
-        return res.status(200).json({listUsers,  message: "Usuários listados com sucesso!"});
-      } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Server Internal Error", error})
+      if (!listUsers) {
+        return res.status(500).json({ message: "Não há funcionários!" });
       }
+
+      return res
+        .status(200)
+        .json({ listUsers, message: "Funcionários listados com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
     }
+  }
 }
 
 export default new EmployeeController();

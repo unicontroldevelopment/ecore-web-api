@@ -1,7 +1,9 @@
 import { Employees } from "@prisma/client";
 import prisma from "../database/prisma";
 
-type EmployeeUpdateInput = Partial<Omit<Employees, 'id' | 'created' | 'updated'>>;
+type EmployeeUpdateInput = Partial<
+  Omit<Employees, "id" | "created" | "updated">
+>;
 class EmployeeService {
   async getById(id: number) {
     const user = await prisma.employees.findUnique({
@@ -63,7 +65,7 @@ class EmployeeService {
         notebookProperty,
         coolerProperty,
         officeVersion,
-        windowsVersion,      
+        windowsVersion,
       },
     });
 
@@ -84,15 +86,38 @@ class EmployeeService {
         id: id,
       },
       data: updateData,
-    })
+    });
 
     return user;
   }
 
-  async getAllUsers() {
-    const users = await prisma.employees.findMany()
+  async getAll(
+    role?: string,
+    name?: string,
+    department?: string,
+    company?: string,
+    unit?: string
+  ) {
+    const employees = await prisma.employees.findMany({
+      where: {
+        AND: [
+          {
+            name: {
+              contains: name ? name : "",
+            },
+          },
+          role ? { role } : {},
+          department ? { department } : {},
+          company ? { company } : {},
+          unit ? { unit } : {},
+        ],
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
 
-    return users;
+    return employees;
   }
 }
 
