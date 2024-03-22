@@ -1,6 +1,20 @@
+import { ServerAccess } from "@prisma/client";
 import prisma from "../database/prisma";
 
+type ServerAccessUpdateInput = Partial<Omit<ServerAccess, 'id' | 'created' | 'updated'>>;
 class ServerAccessService {
+  async getById(id: number) {
+    const user = await prisma.serverAccess.findUnique({
+      where: { id },
+    });
+
+    return user;
+  }
+  async getAllUsers() {
+    const users = await prisma.serverAccess.findMany()
+
+    return users;
+  }
     async create(
         fitolog:           boolean,
         commercial:        boolean,
@@ -47,6 +61,23 @@ class ServerAccessService {
           });
       
           return user;
+    }
+    async delete(id: number) {
+      const user = await prisma.serverAccess.delete({
+        where: { id },
+      });
+  
+      return user;
+    }
+    async update(id: number, updateData: ServerAccessUpdateInput) {
+      const user = await prisma.serverAccess.update({
+        where: {
+          id: id,
+        },
+        data: updateData,
+      })
+  
+      return user;
     }
 }
 

@@ -3,6 +3,10 @@ import { sign } from "jsonwebtoken";
 import prisma from "../database/prisma";
 import EmployeeService from "../services/EmployeeService";
 
+
+interface User {
+  name: string;
+}
 class EmployeeController {
   async login(req: Request, res: Response) {
     try {
@@ -165,6 +169,12 @@ class EmployeeController {
         if(!listUsers) {
           return res.status(500).json({ message: "Não há usuários!" });
         }
+
+        const sortUsersAlphabetically = (users: User[]) => {
+          return users.sort((a, b) => a.name.localeCompare(b.name));
+        };
+
+        sortUsersAlphabetically(listUsers);
 
         return res.status(200).json({listUsers,  message: "Usuários listados com sucesso!"});
       } catch (error) {
