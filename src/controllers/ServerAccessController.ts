@@ -25,16 +25,20 @@ class ServerAccessController {
   }
   async getAllUsers(req: Request, res: Response) {
     try {
-      const listUsers = await ServerAccessService.getAllUsers()
+      const { name } = req.query;
 
-      if(!listUsers) {
+      const listUsers = await ServerAccessService.getAllUsers(name?.toString());
+
+      if (!listUsers) {
         return res.status(500).json({ message: "Não há usuários!" });
       }
 
-      return res.status(200).json({listUsers,  message: "Usuários listados com sucesso!"});
+      return res
+        .status(200)
+        .json({ listUsers, message: "Usuários listados com sucesso!" });
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({ message: "Server Internal Error", error})
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
   async create(req: Request, res: Response) {
@@ -82,7 +86,7 @@ class ServerAccessController {
   async delete(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id);
-      
+
       const existedUser = await prisma.serverAccess.findUnique({
         where: { id: userId },
       });
@@ -93,17 +97,18 @@ class ServerAccessController {
 
       const user = await ServerAccessService.delete(userId);
 
-      return res.status(200).json({user,  message: "Usuário deletado com sucesso!"});
-
+      return res
+        .status(200)
+        .json({ user, message: "Usuário deletado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
-  async update(req: Request, res: Response){
+  async update(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id);
-    
+
       const existedUser = await prisma.serverAccess.findUnique({
         where: { id: userId },
       });
@@ -113,18 +118,17 @@ class ServerAccessController {
       }
 
       const updateData = await req.body;
-      
+
       const updatedUser = await ServerAccessService.update(userId, updateData);
-      
 
-      return res.status(200).json({updatedUser, message: "Usuário atualizado com sucesso!"});
-
+      return res
+        .status(200)
+        .json({ updatedUser, message: "Usuário atualizado com sucesso!" });
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({ message: "Server Internal Error", error})
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
-
 }
 
 export default new ServerAccessController();
