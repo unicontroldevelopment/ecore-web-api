@@ -27,9 +27,10 @@ class ServerAccessService {
         name: "asc",
       },
       select: {
-        name: true, // Seleciona apenas o campo 'name' de Employees
+        name: true,
         ServerAccess: {
           select: {
+            id: true,
             fitolog: true,
             commercial: true,
             administrative: true,
