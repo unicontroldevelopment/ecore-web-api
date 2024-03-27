@@ -12,13 +12,13 @@ class EmailService {
 
     return user;
   }
-  async getAllEmails(email?: string) {
+  async getAllEmails(type?: string) {
     const users = await prisma.emails.findMany({
       where: {
         AND: [
           {
-            email: {
-              contains: email ? email : "",
+            type: {
+              contains: type ? type : "",
             },
           },
         ],
@@ -40,8 +40,8 @@ class EmailService {
     return users;
   }
   async create(
-    type: string,
     email: string,
+    type: string,
     password: string,
   ) {
     const userAlreadyExists = await prisma.emails.findUnique({
@@ -55,8 +55,8 @@ class EmailService {
     const user = await prisma.emails.create({
       data: {
         email,
-        password,
         type,
+        password,
       },
     });
 

@@ -17,8 +17,8 @@ class EmailController {
 
       const user = await EmailService.create(
         email,
-        password,
-        type
+        type,
+        password
       );
 
       return res
