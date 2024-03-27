@@ -11,27 +11,27 @@ datasource db {
 }
 
 model Employees {
-  id                Int      @id @default(autoincrement())
-  name              String
-  role              String?
-  password          String?
-  department        String?
-  company           String?
-  unit              String?
-  networkUser       String?
-  networkPassword   String?
-  email             String @unique
-  emailPassword     String?
-  discordEmail      String?
-  discordPassword   String?
-  notebookBrand     String?
-  notebookName      String?
-  notebookProperty  String?
-  coolerProperty    String?
-  officeVersion     String?
-  windowsVersion    String?
-  created           DateTime @default(now())
-  updated           DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  name             String
+  role             String?
+  password         String?
+  department       String?
+  company          String?
+  unit             String?
+  networkUser      String?
+  networkPassword  String?
+  email            String   @unique
+  emailPassword    String?
+  discordEmail     String?
+  discordPassword  String?
+  notebookBrand    String?
+  notebookName     String?
+  notebookProperty String?
+  coolerProperty   String?
+  officeVersion    String?
+  windowsVersion   String?
+  created          DateTime @default(now())
+  updated          DateTime @updatedAt
 
   ServerAccess ServerAccess[]
 
@@ -39,7 +39,7 @@ model Employees {
 }
 
 model ServerAccess {
-  id                Int     @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   fitolog           Boolean
   commercial        Boolean
   administrative    Boolean
@@ -53,10 +53,34 @@ model ServerAccess {
   it                Boolean
   temp              Boolean
   franchises        Boolean
-  created           DateTime @default(now())
-  updated           DateTime @updatedAt
+  created           DateTime  @default(now())
+  updated           DateTime  @updatedAt
   employeeId        Int
   Employees         Employees @relation(fields: [employeeId], references: [id])
 
   @@map("serverAccess")
+}
+
+model Emails {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  type     String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+
+  Redirects Redirects[]
+
+  @@map("email")
+}
+
+model Redirects {
+  id       Int      @id @default(autoincrement())
+  email    String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+  email_id Int
+  Emails   Emails   @relation(fields: [email_id], references: [id])
+
+  @@map("redirects")
 }
