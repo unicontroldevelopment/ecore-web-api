@@ -84,3 +84,49 @@ model Redirects {
 
   @@map("redirects")
 }
+
+model Contracts {
+  id             Int      @id @default(autoincrement())
+  cpfcnpj        String
+  cep            String
+  road           String
+  number         Int
+  complement     String?
+  neighborhood   String
+  city           String
+  tecSignature   String
+  contractNumber Int
+  date           DateTime
+  value          Decimal  @db.Decimal(8, 2)
+  index          String
+  created        DateTime @default(now())
+  updated        DateTime @updatedAt
+
+  contracs_Service Contract_Service[]
+
+  @@map("contracts")
+}
+
+model Contract_Service {
+  id          Int       @id @default(autoincrement())
+  contract_id Int
+  service_id  Int
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Services    Services  @relation(fields: [service_id], references: [id])
+  Contracts   Contracts @relation(fields: [contract_id], references: [id])
+
+  @@map("contract_service")
+}
+
+model Services {
+  id          Int      @id @default(autoincrement())
+  description String
+  code        String
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+
+  contracs_Service Contract_Service[]
+
+  @@map("servivces")
+}

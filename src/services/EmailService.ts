@@ -2,7 +2,7 @@ import { Emails } from "@prisma/client";
 import prisma from "../database/prisma";
 
 type EmailsUpdateInput = Partial<
-  Omit<Emails, "id" | "created" | "updated" | "Redirects">
+  Omit<Emails, "id" | "created" | "updated">
 >;
 class EmailService {
   async getById(id: number) {
