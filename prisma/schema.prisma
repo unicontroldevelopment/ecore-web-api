@@ -128,5 +128,5 @@ model Services {
 
   contracs_Service Contract_Service[]
 
-  @@map("servivces")
+  @@map("services")
 }

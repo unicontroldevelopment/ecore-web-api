@@ -1,4 +1,5 @@
 import { Router } from "express";
+import DocumentsController from "./controllers/DocumentsController";
 import EmailController from "./controllers/EmailController";
 import EmployeeController from "./controllers/EmployeeController";
 import ServerAccessController from "./controllers/ServerAccessController";
@@ -24,5 +25,10 @@ routes.get("/emails", EmailController.getAll);
 routes.get("/email/:id", EmailController.getById);
 routes.delete("/email/:id", EmailController.delete);
 routes.put("/email/:id", EmailController.update)
+
+routes.post("/service", DocumentsController.createService);
+routes.get("/services",  DocumentsController.getServices);
+routes.delete("/service/:id",  DocumentsController.deleteService);
+routes.put("/service/:id",  DocumentsController.updateService);
 
 export default routes;
