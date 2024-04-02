@@ -103,8 +103,29 @@ model Contracts {
   updated        DateTime @updatedAt
 
   contracs_Service Contract_Service[]
+  clauses          Clauses[]
 
   @@map("contracts")
+}
+
+model Clauses {
+  id          Int       @id @default(autoincrement())
+  clause1     String
+  clause2     String
+  clause3     String
+  clause4     String
+  clause5     String
+  clause6     String
+  clause7     String
+  clause8     String
+  clause9     String
+  clause10    String
+  contract_id Int
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Contracts   Contracts @relation(fields: [contract_id], references: [id])
+
+  @@map("clauses")
 }
 
 model Contract_Service {
