@@ -31,4 +31,9 @@ routes.get("/services",  DocumentsController.getServices);
 routes.delete("/service/:id",  DocumentsController.deleteService);
 routes.put("/service/:id",  DocumentsController.updateService);
 
+routes.post("/contract", DocumentsController.createContract);
+routes.get("/contracts",  DocumentsController.getContracts);
+routes.delete("/contract/:id",  DocumentsController.deleteContract);
+routes.put("/contract/:id",  DocumentsController.updateContract);
+
 export default routes;

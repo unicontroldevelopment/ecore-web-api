@@ -6,7 +6,7 @@ import DocumentsService from "../services/DocumentsService";
 interface User {
   name: string;
 }
-class EmailController {
+class DocumentsController {
   async createService(req: Request, res: Response) {
     try {
       const {
@@ -98,6 +98,121 @@ class EmailController {
       return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
+  async createContract(req: Request, res: Response) {
+    try {
+      const {
+        status,
+        name,
+        cpfcnpj,
+        cep,
+        road,
+        number,
+        complement,
+        neighborhood,
+        city,
+        tecSignature,
+        contractNumber,
+        date,
+        value,
+        index,
+      } = req.body;
+
+      const user = await DocumentsService.createContract(
+        status,
+        name,
+        cpfcnpj,
+        cep,
+        road,
+        number,
+        complement,
+        neighborhood,
+        city,
+        tecSignature,
+        contractNumber,
+        date,
+        value,
+        index,
+      );
+
+      return res
+        .status(201)
+        .json({ user, message: "Contrato criado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error });
+    }
+  }
+
+  async deleteContract(req: Request, res: Response) {
+    try {
+      const contractId = parseInt(req.params.id);
+
+      const existedContract = await prisma.contracts.findUnique({
+        where: { id: contractId },
+      });
+
+      if (!existedContract) {
+        return res.status(500).json({ message: "Contrato não encontrado!" });
+      }
+
+      const contract = await DocumentsService.deleteContract(contractId);
+
+      return res
+        .status(200)
+        .json({ contract, message: "Contrato deletado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async updateContract(req: Request, res: Response) {
+    try {
+      const contractId = parseInt(req.params.id);
+
+      const existedContract = await prisma.contracts.findUnique({
+        where: { id: contractId },
+      });
+
+      if (!existedContract) {
+        return res.status(500).json({ message: "Contrato não encontrado!" });
+      }
+
+      const updateData = await req.body;
+      const { clauses, ...contractData} = updateData;
+      
+
+      const updatedContract = await DocumentsService.updateContract(contractId, contractData);
+
+      return res
+        .status(200)
+        .json({ updatedContract, message: "Contrato atualizado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async getContracts(req: Request, res: Response) {
+    try {
+      const { type } = req.query;
+
+      const listContracts= await DocumentsService.getContracts(
+        type?.toString(),
+      );
+
+      if (!listContracts) {
+        return res.status(500).json({ message: "Não há contratos!" });
+      }
+
+      return res
+        .status(200)
+        .json({ listContracts, message: "Contratos listados com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
 }
 
-export default new EmailController();
+export default new DocumentsController();
