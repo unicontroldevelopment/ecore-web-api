@@ -8,6 +8,11 @@ type ServicesUpdateInput = Partial<
 type ContractUpdateInput = Partial<
   Omit<Contracts, "id" | "created" | "updated">
 >;
+
+interface ClauseInput {
+  numberClause: number;
+  description: string;
+}
 class DocumentsService {
   async getServices(type?: string) {
     const users = await prisma.services.findMany({
@@ -32,10 +37,7 @@ class DocumentsService {
 
     return users;
   }
-  async createService(
-    description: string,
-    code: string,
-  ) {
+  async createService(description: string, code: string) {
     const userAlreadyExists = await prisma.services.findFirst({
       where: { code },
     });
@@ -47,7 +49,7 @@ class DocumentsService {
     const user = await prisma.services.create({
       data: {
         description,
-        code
+        code,
       },
     });
 
@@ -100,6 +102,12 @@ class DocumentsService {
         date: true,
         value: true,
         index: true,
+        clauses: {
+          select: {
+            id: true,
+            description: true,
+          }
+        }
       },
     });
 
@@ -115,29 +123,22 @@ class DocumentsService {
     complement: string,
     neighborhood: string,
     city: string,
+    state: string,
     tecSignature: string,
     contractNumber: number,
-    dateString: string,
+    date: string,
     value: string,
     index: string,
+    services: number[],
+    clauses: ClauseInput[],
   ) {
     const userAlreadyExists = await prisma.contracts.findFirst({
-      where: { contractNumber },
+      where: { contractNumber: contractNumber },
     });
 
     if (userAlreadyExists) {
       throw new Error("Contrato já existe!");
     }
-
-    function stringToDate(str: string) {
-      const year = str.substring(0, 4);
-      const month = str.substring(4, 6);
-      const day = str.substring(6, 8);
-    
-      return new Date(`${year}-${month}-${day}`);
-    }
-
-    const date = stringToDate(dateString);
 
     const user = await prisma.contracts.create({
       data: {
@@ -150,11 +151,23 @@ class DocumentsService {
         complement,
         neighborhood,
         city,
+        state,
         tecSignature,
         contractNumber,
-        date: date.toISOString(),
+        date,
         value,
         index,
+        contracs_Service: {
+          create: services.map(services => ({
+            service_id: services
+          }))
+        },
+        clauses: {
+          create: clauses.map(({ numberClause, description }) => ({
+            numberClause,
+            description,
+          })),
+        },
       },
     });
 

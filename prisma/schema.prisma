@@ -96,6 +96,7 @@ model Contracts {
   complement     String?
   neighborhood   String
   city           String
+  state          String
   tecSignature   String
   contractNumber Int
   date           DateTime
@@ -106,20 +107,32 @@ model Contracts {
 
   contracs_Service Contract_Service[]
   clauses          Clauses[]
+  propouse         Propouse[]
 
   @@map("contracts")
 }
 
 model Clauses {
+  id           Int       @id @default(autoincrement())
+  numberClause Int
+  description  String    @db.LongText
+  contract_id  Int
+  created      DateTime  @default(now())
+  updated      DateTime  @updatedAt
+  Contracts    Contracts @relation(fields: [contract_id], references: [id])
+
+  @@map("clauses")
+}
+
+model Propouse {
   id          Int       @id @default(autoincrement())
-  number      Int
-  description String
+  file        String
   contract_id Int
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
   Contracts   Contracts @relation(fields: [contract_id], references: [id])
 
-  @@map("clauses")
+  @@map("propouse")
 }
 
 model Contract_Service {

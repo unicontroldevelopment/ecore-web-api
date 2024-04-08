@@ -110,12 +110,18 @@ class DocumentsController {
         complement,
         neighborhood,
         city,
+        state,
         tecSignature,
         contractNumber,
         date,
         value,
         index,
+        servicesContract,  
+        clauses,      
       } = req.body;
+
+      const numberInt = parseInt(number, 10)
+      const contractNumberInt = parseInt(contractNumber, 10)
 
       const user = await DocumentsService.createContract(
         status,
@@ -123,15 +129,18 @@ class DocumentsController {
         cpfcnpj,
         cep,
         road,
-        number,
+        numberInt,
         complement,
         neighborhood,
         city,
+        state,
         tecSignature,
-        contractNumber,
+        contractNumberInt,
         date,
         value,
         index,
+        servicesContract,  
+        clauses,
       );
 
       return res
