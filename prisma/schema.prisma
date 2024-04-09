@@ -105,21 +105,20 @@ model Contracts {
   created        DateTime @default(now())
   updated        DateTime @updatedAt
 
-  contracs_Service Contract_Service[]
-  clauses          Clauses[]
-  propouse         Propouse[]
+  contracts_Service Contract_Service[]
+  clauses           Clauses[]
+  propouse          Propouse[]
 
   @@map("contracts")
 }
 
 model Clauses {
-  id           Int       @id @default(autoincrement())
-  numberClause Int
-  description  String    @db.LongText
-  contract_id  Int
-  created      DateTime  @default(now())
-  updated      DateTime  @updatedAt
-  Contracts    Contracts @relation(fields: [contract_id], references: [id])
+  id          Int       @id @default(autoincrement())
+  description String    @db.LongText
+  contract_id Int
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Contracts   Contracts @relation(fields: [contract_id], references: [id])
 
   @@map("clauses")
 }

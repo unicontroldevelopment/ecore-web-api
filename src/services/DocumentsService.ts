@@ -1,4 +1,4 @@
-import { Contracts, Services } from "@prisma/client";
+import { Clauses, Contract_Service, Contracts, Services } from "@prisma/client";
 import prisma from "../database/prisma";
 
 type ServicesUpdateInput = Partial<
@@ -8,9 +8,15 @@ type ServicesUpdateInput = Partial<
 type ContractUpdateInput = Partial<
   Omit<Contracts, "id" | "created" | "updated">
 >;
+type ClauseUpdateInput = Partial<
+  Omit<Clauses, "id" | "created" | "updated">
+>;
+
+type ContractServiceUpdateInput = Partial<
+  Omit<Contract_Service, "id" | "created" | "updated">
+>;
 
 interface ClauseInput {
-  numberClause: number;
   description: string;
 }
 class DocumentsService {
@@ -77,7 +83,7 @@ class DocumentsService {
       where: {
         AND: [
           {
-            status: {
+            name: {
               contains: type ? type : "",
             },
           },
@@ -97,11 +103,18 @@ class DocumentsService {
         complement: true,
         neighborhood: true,
         city: true,
+        state: true,
         tecSignature: true,
         contractNumber: true,
         date: true,
         value: true,
         index: true,
+        contracts_Service: {
+          select: {
+            id: true,
+            service_id: true,
+          }
+        },
         clauses: {
           select: {
             id: true,
@@ -139,7 +152,7 @@ class DocumentsService {
     if (userAlreadyExists) {
       throw new Error("Contrato já existe!");
     }
-
+    
     const user = await prisma.contracts.create({
       data: {
         status,
@@ -157,20 +170,19 @@ class DocumentsService {
         date,
         value,
         index,
-        contracs_Service: {
-          create: services.map(services => ({
-            service_id: services
+        contracts_Service: {
+          create: services.map(service => ({
+            service_id: service
           }))
         },
         clauses: {
-          create: clauses.map(({ numberClause, description }) => ({
-            numberClause,
+          create: clauses.map(({ description }) => ({
             description,
           })),
         },
       },
     });
-
+    
     return user;
   }
   async deleteContract(id: number) {
@@ -180,15 +192,44 @@ class DocumentsService {
 
     return user;
   }
-  async updateContract(id: number, updateData: ContractUpdateInput) {
-    const user = await prisma.contracts.update({
-      where: {
-        id: id,
-      },
-      data: updateData,
+  async updateContract(id: number, updateData: ContractUpdateInput, serviceData: ContractServiceUpdateInput[], clauseData: ClauseUpdateInput[]) {
+    const result = await prisma.$transaction(async (prisma) => {
+      // Atualiza o contrato
+      const updatedContract = await prisma.contracts.update({
+        where: { id: id },
+        data: updateData,
+      });
+  
+      // Atualizações para Contract_Service
+      const serviceUpdates = serviceData.map((serviceData) => {
+        return prisma.contract_Service.update({
+          where: {
+            id: serviceData.id
+          },
+          data: {
+            service_id: serviceData.service_id
+          },
+        });
+      });
+  
+      const clauseUpdates = clauseData.map((clauseData) => {
+        return prisma.clauses.update({
+          where: {
+            id: clauseData.id
+          },
+          data: {
+            // Os dados de atualização para Clauses
+            description: clauseData.description,
+          },
+        });
+      });
+  
+      // Executar todas as operações de atualização como parte da transação
+      await Promise.all([...serviceUpdates, ...clauseUpdates]);
+  
+      return updatedContract;
     });
-
-    return user;
+    return result;
   }
 }
 

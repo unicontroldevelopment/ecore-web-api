@@ -119,6 +119,7 @@ class DocumentsController {
         servicesContract,  
         clauses,      
       } = req.body;
+      
 
       const numberInt = parseInt(number, 10)
       const contractNumberInt = parseInt(contractNumber, 10)
@@ -188,10 +189,10 @@ class DocumentsController {
       }
 
       const updateData = await req.body;
-      const { clauses, ...contractData} = updateData;
+      const { clauses, contracts_Service, ...contractData} = updateData;
       
 
-      const updatedContract = await DocumentsService.updateContract(contractId, contractData);
+      const updatedContract = await DocumentsService.updateContract(contractId, contractData, contracts_Service, clauses);
 
       return res
         .status(200)
