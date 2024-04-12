@@ -2,10 +2,21 @@ import { Request, Response } from "express";
 import prisma from "../database/prisma";
 import DocumentsService from "../services/DocumentsService";
 
-
-interface User {
-  name: string;
+interface ServiceInput {
+  id: number;
+  contract_id: number;
+  service_id: number;
+  Services?: {
+    id: number;
+    description: string;
+  };
 }
+
+interface ClauseInput {
+  id?: number; // Opcional porque pode não estar presente em novas cláusulas
+  description: string;
+}
+
 class DocumentsController {
   async createService(req: Request, res: Response) {
     try {
@@ -14,14 +25,14 @@ class DocumentsController {
         code
       } = req.body;
 
-      const user = await DocumentsService.createService(
+      const service = await DocumentsService.createService(
         description,
         code
       );
 
       return res
         .status(201)
-        .json({ user, message: "E-mail criado com sucesso!" });
+        .json({ service, message: "Serviço criado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error });
@@ -53,25 +64,25 @@ class DocumentsController {
 
   async updateService(req: Request, res: Response) {
     try {
-      const userId = parseInt(req.params.id);
+      const serviceId = parseInt(req.params.id);
 
-      const existedUser = await prisma.services.findUnique({
-        where: { id: userId },
+      const existedService = await prisma.services.findUnique({
+        where: { id: serviceId },
       });
 
-      if (!existedUser) {
+      if (!existedService) {
         return res.status(500).json({ message: "Serviço não encontrado!" });
       }
 
       const updateData = await req.body;
-      const { Redirects, ...emailData} = updateData;
+      const { Redirects, ...serviceData} = updateData;
       
 
-      const updatedUser = await DocumentsService.updateService(userId, emailData);
+      const updatedService = await DocumentsService.updateService(serviceId, serviceData);
 
       return res
         .status(200)
-        .json({ updatedUser, message: "Serviço atualizado com sucesso!" });
+        .json({ updatedService, message: "Serviço atualizado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -82,17 +93,17 @@ class DocumentsController {
     try {
       const { type } = req.query;
 
-      const listUsers = await DocumentsService.getServices(
+      const listServices = await DocumentsService.getServices(
         type?.toString(),
       );
 
-      if (!listUsers) {
+      if (!listServices) {
         return res.status(500).json({ message: "Não há serviços!" });
       }
 
       return res
         .status(200)
-        .json({ listUsers, message: "Serviços listados com sucesso!" });
+        .json({ listServices, message: "Serviços listados com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -124,7 +135,7 @@ class DocumentsController {
       const numberInt = parseInt(number, 10)
       const contractNumberInt = parseInt(contractNumber, 10)
 
-      const user = await DocumentsService.createContract(
+      const contract = await DocumentsService.createContract(
         status,
         name,
         cpfcnpj,
@@ -146,7 +157,7 @@ class DocumentsController {
 
       return res
         .status(201)
-        .json({ user, message: "Contrato criado com sucesso!" });
+        .json({ contract, message: "Contrato criado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error });

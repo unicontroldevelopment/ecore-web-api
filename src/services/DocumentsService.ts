@@ -1,4 +1,4 @@
-import { Clauses, Contract_Service, Contracts, Services } from "@prisma/client";
+import { Contracts, Services } from "@prisma/client";
 import prisma from "../database/prisma";
 
 type ServicesUpdateInput = Partial<
@@ -8,17 +8,19 @@ type ServicesUpdateInput = Partial<
 type ContractUpdateInput = Partial<
   Omit<Contracts, "id" | "created" | "updated">
 >;
-type ClauseUpdateInput = Partial<
-  Omit<Clauses, "id" | "created" | "updated">
->;
-
-type ContractServiceUpdateInput = Partial<
-  Omit<Contract_Service, "id" | "created" | "updated">
->;
 
 interface ClauseInput {
+  id: number;
+  contract_id: number;
   description: string;
 }
+
+interface ContractServiceInput {
+  id: number;
+  service_id: number;
+  contract_id: number;
+}
+
 class DocumentsService {
   async getServices(type?: string) {
     const users = await prisma.services.findMany({
@@ -112,15 +114,23 @@ class DocumentsService {
         contracts_Service: {
           select: {
             id: true,
+            contract_id: true,
             service_id: true,
-          }
+            Services: {
+              select: {
+                id: true,
+                description: true,
+              },
+            },
+          },
         },
         clauses: {
           select: {
             id: true,
+            contract_id: true,
             description: true,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -143,7 +153,7 @@ class DocumentsService {
     value: string,
     index: string,
     services: number[],
-    clauses: ClauseInput[],
+    clauses: ClauseInput[]
   ) {
     const userAlreadyExists = await prisma.contracts.findFirst({
       where: { contractNumber: contractNumber },
@@ -152,7 +162,7 @@ class DocumentsService {
     if (userAlreadyExists) {
       throw new Error("Contrato já existe!");
     }
-    
+
     const user = await prisma.contracts.create({
       data: {
         status,
@@ -171,9 +181,9 @@ class DocumentsService {
         value,
         index,
         contracts_Service: {
-          create: services.map(service => ({
-            service_id: service
-          }))
+          create: services.map((service) => ({
+            service_id: service,
+          })),
         },
         clauses: {
           create: clauses.map(({ description }) => ({
@@ -182,7 +192,7 @@ class DocumentsService {
         },
       },
     });
-    
+
     return user;
   }
   async deleteContract(id: number) {
@@ -192,43 +202,66 @@ class DocumentsService {
 
     return user;
   }
-  async updateContract(id: number, updateData: ContractUpdateInput, serviceData: ContractServiceUpdateInput[], clauseData: ClauseUpdateInput[]) {
+  async updateContract(id: number, updateData: ContractUpdateInput, newServiceData: ContractServiceInput[], newClauseData: ClauseInput[]) {
     const result = await prisma.$transaction(async (prisma) => {
-      // Atualiza o contrato
       const updatedContract = await prisma.contracts.update({
         where: { id: id },
         data: updateData,
       });
   
-      // Atualizações para Contract_Service
-      const serviceUpdates = serviceData.map((serviceData) => {
-        return prisma.contract_Service.update({
-          where: {
-            id: serviceData.id
-          },
-          data: {
-            service_id: serviceData.service_id
-          },
-        });
+      const existingServices = await prisma.contract_Service.findMany({
+        where: { contract_id: id },
+      });
+      const existingClauses = await prisma.clauses.findMany({
+        where: { contract_id: id },
       });
   
-      const clauseUpdates = clauseData.map((clauseData) => {
-        return prisma.clauses.update({
-          where: {
-            id: clauseData.id
-          },
-          data: {
-            // Os dados de atualização para Clauses
-            description: clauseData.description,
-          },
-        });
+      const servicesToDelete = existingServices.filter(es => !newServiceData.some(ns => ns.contract_id === es.contract_id));
+      const serviceDeletePromises = servicesToDelete.map(service => prisma.contract_Service.delete({ where: { id: service.id } }));
+  
+      const serviceCreateOrUpdatePromises = newServiceData.map(async serviceInput => {
+
+        const existingService = existingServices.find(es => es.id === serviceInput.id);
+        if (existingService) {
+          return prisma.contract_Service.update({
+            where: { id: serviceInput.id },
+            data: { service_id: serviceInput.service_id },
+          });
+        } else {
+          return prisma.contract_Service.create({
+            data: {
+              contract_id: serviceInput.contract_id,
+              service_id: serviceInput.service_id,
+            },
+          });
+        }
       });
   
-      // Executar todas as operações de atualização como parte da transação
-      await Promise.all([...serviceUpdates, ...clauseUpdates]);
+      const clausesToDelete = existingClauses.filter(ec => !newClauseData.some(nc => nc.id === ec.id));
+      const clauseDeletePromises = clausesToDelete.map(clause => prisma.clauses.delete({ where: { id: clause.id } }));
+  
+      const clauseCreateOrUpdatePromises = newClauseData.map(clauseInput => {
+        if (existingClauses.some(ec => ec.id === clauseInput.id)) {
+          return prisma.clauses.update({
+            where: { id: clauseInput.id },
+            data: { description: clauseInput.description },
+          });
+        } else {
+          return prisma.clauses.create({
+            data: {
+              contract_id: id,
+              description: clauseInput.description,
+            },
+          });
+        }
+      });
+  
+      await Promise.all([...serviceDeletePromises, ...clauseDeletePromises]);
+      await Promise.all([...serviceCreateOrUpdatePromises, ...clauseCreateOrUpdatePromises]);
   
       return updatedContract;
     });
+  
     return result;
   }
 }
