@@ -11,8 +11,44 @@ datasource db {
 }
 
 model Employees {
-  id               Int      @id @default(autoincrement())
-  name             String
+  id              Int       @id @default(autoincrement())
+  name            String
+  birthday        DateTime?
+  cpf             String    @unique
+  ctps            String?
+  serie           String?
+  office          String?
+  cbo             Int?
+  education       String?
+  maritalStatus   String?
+  nationality     String?
+  pis             Int?
+  rg              Int?
+  cep             String?
+  road            String?
+  number          Int?
+  complement      String?
+  neighborhood    String?
+  city            String?
+  state           String?
+  level           String?
+  department      String?
+  company         String?
+  costCenter      String?
+  dateAdmission   DateTime?
+  dateResignation DateTime?
+  initialWage     Decimal   @db.Decimal(8, 2)
+  currentWage     Decimal   @db.Decimal(8, 2)
+  created         DateTime  @default(now())
+  updated         DateTime  @updatedAt
+
+  EmployeesInfo EmployeesInfo[]
+
+  @@map("employees")
+}
+
+model EmployeesInfo {
+  id               Int            @id @default(autoincrement())
   role             String?
   password         String?
   department       String?
@@ -20,7 +56,7 @@ model Employees {
   unit             String?
   networkUser      String?
   networkPassword  String?
-  email            String   @unique
+  email            String         @unique
   emailPassword    String?
   discordEmail     String?
   discordPassword  String?
@@ -30,16 +66,17 @@ model Employees {
   coolerProperty   String?
   officeVersion    String?
   windowsVersion   String?
-  created          DateTime @default(now())
-  updated          DateTime @updatedAt
+  created          DateTime       @default(now())
+  updated          DateTime       @updatedAt
+  employeeId       Int
+  Employees        Employees      @relation(fields: [employeeId], references: [id])
+  ServerAccess     ServerAccess[]
 
-  ServerAccess ServerAccess[]
-
-  @@map("employees")
+  @@map("employeesinfo")
 }
 
 model ServerAccess {
-  id                Int       @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   fitolog           Boolean
   commercial        Boolean
   administrative    Boolean
@@ -53,10 +90,10 @@ model ServerAccess {
   it                Boolean
   temp              Boolean
   franchises        Boolean
-  created           DateTime  @default(now())
-  updated           DateTime  @updatedAt
-  employeeId        Int
-  Employees         Employees @relation(fields: [employeeId], references: [id])
+  created           DateTime      @default(now())
+  updated           DateTime      @updatedAt
+  employeeInfoId    Int
+  EmployeesInfo     EmployeesInfo @relation(fields: [employeeInfoId], references: [id])
 
   @@map("serverAccess")
 }

@@ -13,6 +13,11 @@ routes.get("/employees", EmployeeController.getAll);
 routes.get("/employee/:id", EmployeeController.getById);
 routes.delete("/employee/:id", EmployeeController.delete);
 routes.put("/employee/:id", EmployeeController.update)
+routes.post("/employeeInfo", EmployeeController.createInfo);
+routes.get("/employeesInfo", EmployeeController.getAllInfo);
+routes.get("/employeeInfo/:id", EmployeeController.getByIdInfo);
+routes.delete("/employeeInfo/:id", EmployeeController.deleteInfo);
+routes.put("/employeeInfo/:id", EmployeeController.updateInfo)
 
 routes.post("/serverAccess", ServerAccessController.create);
 routes.get("/serverAccessGetAll", ServerAccessController.getAllUsers);

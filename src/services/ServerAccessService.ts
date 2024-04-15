@@ -13,7 +13,7 @@ class ServerAccessService {
     return user;
   }
   async getAllUsers(name?: string) {
-    const users = await prisma.employees.findMany({
+    const users = await prisma.employeesInfo.findMany({
       where: {
         AND: [
           {
