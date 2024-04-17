@@ -44,7 +44,7 @@ class ServerAccessService {
             it: true,
             temp: true,
             franchises: true,
-            employeeId: true,
+            employeeInfoId: true,
           },
         },
       },
@@ -70,10 +70,10 @@ class ServerAccessService {
     it: boolean,
     temp: boolean,
     franchises: boolean,
-    employeeId: number
+    employeeInfoId: number
   ) {
     const userAlreadyExists = await prisma.serverAccess.findFirst({
-      where: { employeeId },
+      where: { employeeInfoId },
     });
 
     if (userAlreadyExists) {
@@ -95,7 +95,7 @@ class ServerAccessService {
         it,
         temp,
         franchises,
-        employeeId,
+        employeeInfoId,
       },
     });
 

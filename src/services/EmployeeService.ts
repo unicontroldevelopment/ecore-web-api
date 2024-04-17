@@ -32,7 +32,8 @@ class EmployeeService {
     notebookProperty: string,
     coolerProperty: string,
     officeVersion: string,
-    windowsVersion: string
+    windowsVersion: string,
+    employeeId: number
   ) {
     if (password !== passwordConfirmation) {
       throw new Error("Senhas não conferem!");
@@ -66,6 +67,7 @@ class EmployeeService {
         coolerProperty,
         officeVersion,
         windowsVersion,
+        employeeId
       },
     });
 

@@ -13,12 +13,14 @@ class EmailController {
         email,
         type,
         password,
+        redirects,
       } = req.body;
 
       const user = await EmailService.create(
         email,
         type,
-        password
+        password,
+        redirects
       );
 
       return res

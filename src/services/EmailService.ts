@@ -4,6 +4,12 @@ import prisma from "../database/prisma";
 type EmailsUpdateInput = Partial<
   Omit<Emails, "id" | "created" | "updated">
 >;
+
+interface RedirectsInput {
+  id: string,
+  email: string
+  email_id: string
+}
 class EmailService {
   async getById(id: number) {
     const user = await prisma.emails.findUnique({
@@ -46,6 +52,7 @@ class EmailService {
     email: string,
     type: string,
     password: string,
+    redirects: RedirectsInput[]
   ) {
     const userAlreadyExists = await prisma.emails.findUnique({
       where: { email },
@@ -60,6 +67,11 @@ class EmailService {
         email,
         type,
         password,
+        Redirects: {
+          create: redirects.map(({ email }) => ({
+            email,
+          })),
+        },
       },
     });
 

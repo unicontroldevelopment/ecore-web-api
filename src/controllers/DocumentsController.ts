@@ -13,7 +13,7 @@ interface ServiceInput {
 }
 
 interface ClauseInput {
-  id?: number; // Opcional porque pode não estar presente em novas cláusulas
+  id?: number;
   description: string;
 }
 

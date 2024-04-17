@@ -49,6 +49,7 @@ model Employees {
 
 model EmployeesInfo {
   id               Int            @id @default(autoincrement())
+  name             String
   role             String?
   password         String?
   department       String?
@@ -66,9 +67,9 @@ model EmployeesInfo {
   coolerProperty   String?
   officeVersion    String?
   windowsVersion   String?
+  employeeId       Int
   created          DateTime       @default(now())
   updated          DateTime       @updatedAt
-  employeeId       Int
   Employees        Employees      @relation(fields: [employeeId], references: [id])
   ServerAccess     ServerAccess[]
 

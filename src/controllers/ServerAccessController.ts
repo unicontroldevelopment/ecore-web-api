@@ -57,7 +57,7 @@ class ServerAccessController {
         it,
         temp,
         franchises,
-        employeeId,
+        employeeInfoId,
       } = req.body;
 
       const response = await ServerAccessService.create(
@@ -74,7 +74,7 @@ class ServerAccessController {
         it,
         temp,
         franchises,
-        employeeId
+        employeeInfoId
       );
 
       return res.status(200).json({ response, message: "Acesso criado!" });

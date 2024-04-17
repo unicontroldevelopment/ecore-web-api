@@ -61,6 +61,7 @@ class EmployeeController {
         coolerProperty,
         officeVersion,
         windowsVersion,
+        employeeId
       } = req.body;
 
       const user = await EmployeeService.createInfo(
@@ -82,7 +83,8 @@ class EmployeeController {
         notebookProperty,
         coolerProperty,
         officeVersion,
-        windowsVersion
+        windowsVersion,
+        employeeId
       );
 
       return res
