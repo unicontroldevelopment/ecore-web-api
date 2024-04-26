@@ -135,7 +135,6 @@ model Contracts {
   neighborhood   String
   city           String
   state          String
-  tecSignature   String
   contractNumber Int
   date           DateTime
   value          Decimal  @db.Decimal(8, 2)
@@ -143,6 +142,7 @@ model Contracts {
   created        DateTime @default(now())
   updated        DateTime @updatedAt
 
+  signOnContract    SignOnContract[]
   contracts_Service Contract_Service[]
   clauses           Clauses[]
   propouse          Propouse[]
@@ -191,7 +191,36 @@ model Services {
   created     DateTime @default(now())
   updated     DateTime @updatedAt
 
-  contracs_Service Contract_Service[]
+  contracts_Service Contract_Service[]
 
   @@map("services")
+}
+
+model SignOnContract {
+  id          Int                @id @default(autoincrement())
+  contract_id Int
+  sign_id     Int
+  created     DateTime           @default(now())
+  updated     DateTime           @updatedAt
+  Contract    Contracts          @relation(fields: [contract_id], references: [id])
+  Sign        Contract_Signature @relation(fields: [sign_id], references: [id])
+
+  @@map("signoncontract")
+}
+
+model Contract_Signature {
+  id              Int    @id @default(autoincrement())
+  cpf             String
+  email           String
+  phone           String
+  address         String
+  socialReason    String
+  cnpj            String
+  responsibleName String
+  state           String
+  city            String
+
+  Sign SignOnContract[]
+
+  @@map("contract_signature")
 }

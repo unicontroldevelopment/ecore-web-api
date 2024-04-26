@@ -1,4 +1,5 @@
 import { Router } from "express";
+import ContractSignatureController from "./controllers/ContractSignatureController";
 import DocumentsController from "./controllers/DocumentsController";
 import EmailController from "./controllers/EmailController";
 import EmployeeController from "./controllers/EmployeeController";
@@ -40,5 +41,11 @@ routes.post("/contract", DocumentsController.createContract);
 routes.get("/contracts",  DocumentsController.getContracts);
 routes.delete("/contract/:id",  DocumentsController.deleteContract);
 routes.put("/contract/:id",  DocumentsController.updateContract);
+
+routes.post("/contractSign", ContractSignatureController.create);
+routes.get("/contractSigns", ContractSignatureController.getAll);
+routes.get("/contractSign/:id", ContractSignatureController.getById);
+routes.delete("/contractSign/:id", ContractSignatureController.delete);
+routes.put("/contractSign/:id", ContractSignatureController.update)
 
 export default routes;

@@ -134,6 +134,7 @@ class DocumentsController {
 
       const numberInt = parseInt(number, 10)
       const contractNumberInt = parseInt(contractNumber, 10)
+      const signNumber = parseInt(tecSignature, 10)
 
       const contract = await DocumentsService.createContract(
         status,
@@ -146,7 +147,7 @@ class DocumentsController {
         neighborhood,
         city,
         state,
-        tecSignature,
+        signNumber,
         contractNumberInt,
         date,
         value,

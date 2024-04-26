@@ -106,7 +106,14 @@ class DocumentsService {
         neighborhood: true,
         city: true,
         state: true,
-        tecSignature: true,
+        signOnContract: {
+          select: {
+            id: true,
+            contract_id: true,
+            sign_id: true,
+            Sign: true,
+          }
+        },
         contractNumber: true,
         date: true,
         value: true,
@@ -147,7 +154,7 @@ class DocumentsService {
     neighborhood: string,
     city: string,
     state: string,
-    tecSignature: string,
+    signNumber: number,
     contractNumber: number,
     date: string,
     value: string,
@@ -175,7 +182,11 @@ class DocumentsService {
         neighborhood,
         city,
         state,
-        tecSignature,
+        signOnContract: {
+          create: {
+            sign_id: signNumber
+          }
+        },
         contractNumber,
         date,
         value,
