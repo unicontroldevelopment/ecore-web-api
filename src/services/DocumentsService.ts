@@ -15,6 +15,12 @@ interface ClauseInput {
   description: string;
 }
 
+interface SignInput {
+  id: number;
+  contract_id: number;
+  sign_id: number;
+}
+
 interface ContractServiceInput {
   id: number;
   service_id: number;
@@ -97,6 +103,7 @@ class DocumentsService {
       select: {
         id: true,
         status: true,
+        d4sign: true,
         name: true,
         cpfcnpj: true,
         cep: true,
@@ -111,7 +118,7 @@ class DocumentsService {
             id: true,
             contract_id: true,
             sign_id: true,
-            Sign: true,
+            Contract_Signature: true,
           }
         },
         contractNumber: true,
@@ -154,11 +161,11 @@ class DocumentsService {
     neighborhood: string,
     city: string,
     state: string,
-    signNumber: number,
     contractNumber: number,
     date: string,
     value: string,
     index: string,
+    signNumber: number,
     services: number[],
     clauses: ClauseInput[]
   ) {
@@ -182,15 +189,15 @@ class DocumentsService {
         neighborhood,
         city,
         state,
+        contractNumber,
+        date,
+        value,
+        index,
         signOnContract: {
           create: {
             sign_id: signNumber
           }
         },
-        contractNumber,
-        date,
-        value,
-        index,
         contracts_Service: {
           create: services.map((service) => ({
             service_id: service,
@@ -213,12 +220,16 @@ class DocumentsService {
 
     return user;
   }
-  async updateContract(id: number, updateData: ContractUpdateInput, newServiceData: ContractServiceInput[], newClauseData: ClauseInput[]) {
+  async updateContract(id: number, updateData: ContractUpdateInput, newServiceData: ContractServiceInput[], newClauseData: ClauseInput[], newSignData: SignInput[]) {
     const result = await prisma.$transaction(async (prisma) => {
       const updatedContract = await prisma.contracts.update({
         where: { id: id },
         data: updateData,
       });
+
+      const existingSign = await prisma.signOnContract.findMany({
+        where: { contract_id: id }
+      })
   
       const existingServices = await prisma.contract_Service.findMany({
         where: { contract_id: id },
@@ -226,6 +237,25 @@ class DocumentsService {
       const existingClauses = await prisma.clauses.findMany({
         where: { contract_id: id },
       });
+
+      const SignToDelete = existingSign.filter(ec => !newSignData.some(nc => nc.id === ec.id));
+      const SignDeletePromises = SignToDelete.map(sign => prisma.signOnContract.delete({ where: { id: sign.id } }));
+  
+      const signCreateOrUpdatePromises = newSignData.map(signInput => {
+        if (existingClauses.some(ec => ec.id === signInput.id)) {
+          return prisma.signOnContract.update({
+            where: { id: signInput.id },
+            data: { sign_id: signInput.sign_id },
+          });
+        } else {
+          return prisma.signOnContract.create({
+            data: {
+              contract_id: id,
+              sign_id: signInput.sign_id,
+            },
+          });
+        }
+      })
   
       const servicesToDelete = existingServices.filter(es => !newServiceData.some(ns => ns.contract_id === es.contract_id));
       const serviceDeletePromises = servicesToDelete.map(service => prisma.contract_Service.delete({ where: { id: service.id } }));
@@ -266,7 +296,9 @@ class DocumentsService {
           });
         }
       });
-  
+      
+      await Promise.all([...signCreateOrUpdatePromises]);
+      await Promise.all([...SignDeletePromises, ...SignDeletePromises]);
       await Promise.all([...serviceDeletePromises, ...clauseDeletePromises]);
       await Promise.all([...serviceCreateOrUpdatePromises, ...clauseCreateOrUpdatePromises]);
   

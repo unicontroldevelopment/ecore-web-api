@@ -122,11 +122,11 @@ class DocumentsController {
         neighborhood,
         city,
         state,
-        tecSignature,
         contractNumber,
         date,
         value,
         index,
+        signOnContract,
         servicesContract,  
         clauses,      
       } = req.body;
@@ -134,7 +134,8 @@ class DocumentsController {
 
       const numberInt = parseInt(number, 10)
       const contractNumberInt = parseInt(contractNumber, 10)
-      const signNumber = parseInt(tecSignature, 10)
+      const signNumber = parseInt(signOnContract, 10)
+      
 
       const contract = await DocumentsService.createContract(
         status,
@@ -147,11 +148,11 @@ class DocumentsController {
         neighborhood,
         city,
         state,
-        signNumber,
         contractNumberInt,
         date,
         value,
         index,
+        signNumber,
         servicesContract,  
         clauses,
       );
@@ -201,10 +202,11 @@ class DocumentsController {
       }
 
       const updateData = await req.body;
-      const { clauses, contracts_Service, ...contractData} = updateData;
+      
+      const { signOnContract, clauses, contracts_Service, ...contractData} = updateData;
       
 
-      const updatedContract = await DocumentsService.updateContract(contractId, contractData, contracts_Service, clauses);
+      const updatedContract = await DocumentsService.updateContract(contractId, contractData, contracts_Service, clauses, signOnContract);
 
       return res
         .status(200)

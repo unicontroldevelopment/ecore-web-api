@@ -72,6 +72,7 @@ model EmployeesInfo {
   updated          DateTime       @updatedAt
   Employees        Employees      @relation(fields: [employeeId], references: [id])
   ServerAccess     ServerAccess[]
+  logs             LogEntry[]
 
   @@map("employeesinfo")
 }
@@ -126,6 +127,7 @@ model Redirects {
 model Contracts {
   id             Int      @id @default(autoincrement())
   status         String
+  d4sign         String?  @unique
   name           String
   cpfcnpj        String
   cep            String
@@ -145,7 +147,9 @@ model Contracts {
   signOnContract    SignOnContract[]
   contracts_Service Contract_Service[]
   clauses           Clauses[]
-  propouse          Propouse[]
+  additive          Additive?
+  reajustment       Reajustment?
+  Propouse          Propouse[]
 
   @@map("contracts")
 }
@@ -156,7 +160,7 @@ model Clauses {
   contract_id Int
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
-  Contracts   Contracts @relation(fields: [contract_id], references: [id])
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
 
   @@map("clauses")
 }
@@ -167,7 +171,7 @@ model Propouse {
   contract_id Int
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
-  Contracts   Contracts @relation(fields: [contract_id], references: [id])
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
 
   @@map("propouse")
 }
@@ -179,7 +183,7 @@ model Contract_Service {
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
   Services    Services  @relation(fields: [service_id], references: [id])
-  Contracts   Contracts @relation(fields: [contract_id], references: [id])
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
 
   @@map("contract_service")
 }
@@ -197,13 +201,13 @@ model Services {
 }
 
 model SignOnContract {
-  id          Int                @id @default(autoincrement())
-  contract_id Int
-  sign_id     Int
-  created     DateTime           @default(now())
-  updated     DateTime           @updatedAt
-  Contract    Contracts          @relation(fields: [contract_id], references: [id])
-  Sign        Contract_Signature @relation(fields: [sign_id], references: [id])
+  id                 Int                @id @default(autoincrement())
+  contract_id        Int
+  sign_id            Int
+  created            DateTime           @default(now())
+  updated            DateTime           @updatedAt
+  Contract           Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  Contract_Signature Contract_Signature @relation(fields: [sign_id], references: [id])
 
   @@map("signoncontract")
 }
@@ -220,7 +224,94 @@ model Contract_Signature {
   state           String
   city            String
 
-  Sign SignOnContract[]
+  SignOnContract SignOnContract[]
 
   @@map("contract_signature")
+}
+
+model Uniform {
+  id              Int        @id @default(autoincrement())
+  name            String
+  size            String
+  unit            String
+  quantity        Int
+  quantityMinimum Int
+  numberNF        String
+  baseValue       Float
+  barCode         String
+  created         DateTime   @default(now())
+  updated         DateTime   @updatedAt
+  logs            LogEntry[]
+
+  @@map("uniform")
+}
+
+model Product {
+  id                Int        @id @default(autoincrement())
+  name              String
+  unitOfMeasurement String
+  unit              String
+  quantity          Int
+  quantityMinimum   Int
+  numberNF          String
+  baseValue         Float
+  barCode           String
+  created           DateTime   @default(now())
+  updated           DateTime   @updatedAt
+  logs              LogEntry[]
+
+  @@map("product")
+}
+
+model LogEntry {
+  id        Int           @id @default(autoincrement())
+  action    String
+  quantity  Int
+  timestamp DateTime      @default(now())
+  itemType  String // "uniform" or "product"
+  itemId    Int
+  userId    Int
+  unit      String
+  created   DateTime      @default(now())
+  updated   DateTime      @updatedAt
+  user      EmployeesInfo @relation(fields: [userId], references: [id])
+  Product   Product?      @relation(fields: [itemId], references: [id], map: "ProductItemId")
+  Uniform   Uniform?      @relation(fields: [itemId], references: [id], map: "UniformItemId")
+
+  @@map("logentry")
+}
+
+model Reajustment {
+  id            Int       @id @default(autoincrement())
+  contract_id   Int       @unique
+  valueContract Int
+  index         Float
+  created       DateTime  @default(now())
+  updated       DateTime  @updatedAt
+  Contracts     Contracts @relation(fields: [contract_id], references: [id])
+
+  @@map("reajustment")
+}
+
+model Additive {
+  id               Int                @id @default(autoincrement())
+  contract_id      Int                @unique
+  newValue         Int
+  created          DateTime           @default(now())
+  updated          DateTime           @updatedAt
+  Contracts        Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  additive_Clauses Additive_Clauses[]
+
+  @@map("additive")
+}
+
+model Additive_Clauses {
+  id          Int      @id @default(autoincrement())
+  description String   @db.LongText
+  additive_id Int
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+  Additive    Additive @relation(fields: [additive_id], references: [id], onDelete: Cascade)
+
+  @@map("additive_clauses")
 }
