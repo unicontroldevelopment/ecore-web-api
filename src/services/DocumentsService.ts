@@ -145,6 +145,14 @@ class DocumentsService {
             description: true,
           },
         },
+        propouse: {
+          select: {
+            id: true,
+            file: true,
+            fileName: true,
+            contract_id: true,
+          }
+        }
       },
     });
 
@@ -167,7 +175,7 @@ class DocumentsService {
     index: string,
     signNumber: number,
     services: number[],
-    clauses: ClauseInput[]
+    clauses: ClauseInput[],
   ) {
     const userAlreadyExists = await prisma.contracts.findFirst({
       where: { contractNumber: contractNumber },
@@ -204,7 +212,7 @@ class DocumentsService {
           })),
         },
         clauses: {
-          create: clauses.map(({ description }) => ({
+          create: clauses.map(( {description} ) => ({
             description,
           })),
         },

@@ -237,8 +237,8 @@ class EmployeeController {
         education,
         maritalStatus,
         nationality,
-        intoInt(pis),
-        intoInt(rg),
+        pis,
+        rg,
         cep,
         road,
         intoInt(number),
@@ -336,10 +336,13 @@ class EmployeeController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { name } = req.query;
+      const { name, office } = req.query;
+      console.log(name);
+      
 
       const listUsers = await EmployeeService.getAll(
         name?.toString(),
+        office?.toString()
       );
 
       if (!listUsers) {

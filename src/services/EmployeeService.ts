@@ -140,8 +140,8 @@ class EmployeeService {
     education: string,
     maritalStatus: string,
     nationality: string,
-    pis: number,
-    rg: number,
+    pis: string,
+    rg: string,
     cep: string,
     road: string,
     number: number,
@@ -223,7 +223,10 @@ class EmployeeService {
 
   async getAll(
     name?: string,
+    office?: string,
   ) {
+    console.log(office);
+    
     const employees = await prisma.employees.findMany({
       where: {
         AND: [
@@ -232,6 +235,7 @@ class EmployeeService {
               contains: name ? name : "",
             },
           },
+          office ? { office } : {},
         ],
       },
       orderBy: {

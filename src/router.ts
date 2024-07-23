@@ -1,4 +1,5 @@
-import { Router } from "express";
+import express, { Router } from 'express';
+import multer from 'multer';
 import AdditiveOrReajustmentController from "./controllers/AdditiveOrReajustmentController";
 import ContractSignatureController from "./controllers/ContractSignatureController";
 import DocumentsController from "./controllers/DocumentsController";
@@ -21,9 +22,11 @@ import {
   reenviarDocumentoParaAssinar,
   removerAssinaturaDoDocumento,
 } from "./services/D4SignService";
-import { converteValorExtensoHandler } from "./services/UtilsService";
+import { converteValorExtensoHandler, updatePdf, uploadPdf } from "./services/UtilsService";
 
+const app = express();
 const routes = Router();
+const upload = multer();
 
 routes.post("/login", EmployeeController.login);
 //routes.use(authMiddlewares);
@@ -103,5 +106,7 @@ routes.delete("/uniform/:id", UniformController.delete);
 routes.put("/uniform/:id", UniformController.update);
 
 routes.post("/valueExtensible", converteValorExtensoHandler);
+routes.post("/upload",upload.single('file'),  uploadPdf);
+routes.put("/updatePDF",upload.single('file'),  updatePdf);
 
 export default routes;

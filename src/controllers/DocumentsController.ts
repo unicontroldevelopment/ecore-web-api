@@ -17,6 +17,10 @@ interface ClauseInput {
   description: string;
 }
 
+const base64ToBuffer = (base64: string): Buffer => {
+  return Buffer.from(base64, 'base64');
+};
+
 class DocumentsController {
   async createService(req: Request, res: Response) {
     try {
@@ -127,16 +131,14 @@ class DocumentsController {
         value,
         index,
         signOnContract,
-        servicesContract,  
-        clauses,      
+        servicesContract,
+        clauses
       } = req.body;
-      
-
-      const numberInt = parseInt(number, 10)
-      const contractNumberInt = parseInt(contractNumber, 10)
-      const signNumber = parseInt(signOnContract, 10)
-      
-
+  
+      const numberInt = parseInt(number, 10);
+      const contractNumberInt = parseInt(contractNumber, 10);
+      const signNumber = parseInt(signOnContract, 10);
+  
       const contract = await DocumentsService.createContract(
         status,
         name,
@@ -153,10 +155,10 @@ class DocumentsController {
         value,
         index,
         signNumber,
-        servicesContract,  
+        servicesContract,
         clauses,
       );
-
+  
       return res
         .status(201)
         .json({ contract, message: "Contrato criado com sucesso!" });

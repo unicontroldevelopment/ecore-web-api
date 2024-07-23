@@ -22,8 +22,8 @@ model Employees {
   education       String?
   maritalStatus   String?
   nationality     String?
-  pis             Int?
-  rg              Int?
+  pis             String?
+  rg              String?
   cep             String?
   road            String?
   number          Int?
@@ -149,7 +149,7 @@ model Contracts {
   clauses           Clauses[]
   additive          Additive?
   reajustment       Reajustment?
-  Propouse          Propouse[]
+  propouse          Propouse?
 
   @@map("contracts")
 }
@@ -167,8 +167,9 @@ model Clauses {
 
 model Propouse {
   id          Int       @id @default(autoincrement())
-  file        String
-  contract_id Int
+  file        Bytes     @db.LongBlob
+  fileName    String
+  contract_id Int       @unique
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
   Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
