@@ -8,13 +8,42 @@ class EmployeeService {
   async getByIdInfo(id: number) {
     const user = await prisma.employeesInfo.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        password:true,
+        department: true,
+        company: true,
+        unit: true,
+        networkUser: true,
+        networkPassword: true,
+        email: true,
+        emailPassword: true,
+        discordEmail: true,
+        discordPassword: true,
+        notebookBrand: true,
+        notebookName: true,
+        notebookProperty: true,
+        coolerProperty: true,
+        officeVersion: true,
+        windowsVersion: true,
+        employeeId: true,
+        role: {
+          select: {
+            roleId: true,
+            role: true,
+            employee: true,
+            employeeId: true
+          }
+        }
+      },
     });
 
     return user;
   }
 
   async createInfo(
-    role: string,
+    roles: string[],
     name: string,
     password: string,
     passwordConfirmation: string,
@@ -49,8 +78,17 @@ class EmployeeService {
 
     const user = await prisma.employeesInfo.create({
       data: {
-        role,
         name,
+        role: {
+          create: roles.map(role => ({
+            role: {
+              connectOrCreate: {
+                where: { name: role },
+                create: { name: role }
+              }
+            }
+          }))
+        },
         password,
         department,
         company,
@@ -67,8 +105,9 @@ class EmployeeService {
         coolerProperty,
         officeVersion,
         windowsVersion,
-        employeeId
+        employeeId,
       },
+      
     });
 
     return user;
@@ -82,19 +121,35 @@ class EmployeeService {
     return user;
   }
 
-  async updateInfo(id: number, updateData: EmployeeUpdateInput) {
+  async updateInfo(id: number, updateData: EmployeeUpdateInput, roles: { role: { name: string } }[]) { 
+
     const user = await prisma.employeesInfo.update({
       where: {
         id: id,
       },
-      data: updateData,
+      data: {
+        ...updateData,
+        role: roles.length > 0
+        ? {
+            deleteMany: {}, 
+            create: roles.map(roleObj => ({
+              role: {
+                connectOrCreate: {
+                  where: { name: roleObj.role.name },
+                  create: { name: roleObj.role.name }
+                }
+              }
+            }))
+          }
+        : undefined, 
+    },
     });
 
     return user;
   }
 
   async getAllInfo(
-    role?: string,
+    roles?: string,
     name?: string,
     department?: string,
     company?: string,
@@ -108,11 +163,39 @@ class EmployeeService {
               contains: name ? name : "",
             },
           },
-          role ? { role } : {},
           department ? { department } : {},
           company ? { company } : {},
           unit ? { unit } : {},
         ],
+      },
+      select: {
+        id: true,
+        name: true,
+        password:true,
+        department: true,
+        company: true,
+        unit: true,
+        networkUser: true,
+        networkPassword: true,
+        email: true,
+        emailPassword: true,
+        discordEmail: true,
+        discordPassword: true,
+        notebookBrand: true,
+        notebookName: true,
+        notebookProperty: true,
+        coolerProperty: true,
+        officeVersion: true,
+        windowsVersion: true,
+        employeeId: true,
+        role: {
+          select: {
+            roleId: true,
+            role: true,
+            employee: true,
+            employeeId: true
+          }
+        }
       },
       orderBy: {
         name: "asc",
@@ -225,7 +308,6 @@ class EmployeeService {
     name?: string,
     office?: string,
   ) {
-    console.log(office);
     
     const employees = await prisma.employees.findMany({
       where: {

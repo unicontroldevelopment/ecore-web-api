@@ -153,8 +153,10 @@ class EmployeeController {
       }
 
       const updateData = await req.body;
+      
+      const {role , ...restOfData} = updateData;
 
-      const updatedUser = await EmployeeService.updateInfo(userId, updateData);
+      const updatedUser = await EmployeeService.updateInfo(userId, restOfData, role);
 
       return res
         .status(200)
@@ -336,9 +338,7 @@ class EmployeeController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { name, office } = req.query;
-      console.log(name);
-      
+      const { name, office } = req.query;  
 
       const listUsers = await EmployeeService.getAll(
         name?.toString(),

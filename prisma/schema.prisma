@@ -37,8 +37,8 @@ model Employees {
   costCenter      String?
   dateAdmission   DateTime?
   dateResignation DateTime?
-  initialWage     Decimal   @db.Decimal(8, 2)
-  currentWage     Decimal   @db.Decimal(8, 2)
+  initialWage     Decimal?  @db.Decimal(10, 2)
+  currentWage     Decimal?  @db.Decimal(10, 2)
   created         DateTime  @default(now())
   updated         DateTime  @updatedAt
 
@@ -48,16 +48,15 @@ model Employees {
 }
 
 model EmployeesInfo {
-  id               Int            @id @default(autoincrement())
+  id               Int                  @id @default(autoincrement())
   name             String
-  role             String?
   password         String?
   department       String?
   company          String?
   unit             String?
   networkUser      String?
   networkPassword  String?
-  email            String         @unique
+  email            String               @unique
   emailPassword    String?
   discordEmail     String?
   discordPassword  String?
@@ -68,11 +67,12 @@ model EmployeesInfo {
   officeVersion    String?
   windowsVersion   String?
   employeeId       Int
-  created          DateTime       @default(now())
-  updated          DateTime       @updatedAt
-  Employees        Employees      @relation(fields: [employeeId], references: [id])
+  created          DateTime             @default(now())
+  updated          DateTime             @updatedAt
+  Employees        Employees            @relation(fields: [employeeId], references: [id])
   ServerAccess     ServerAccess[]
   logs             LogEntry[]
+  role             EmployeesInfoRoles[]
 
   @@map("employeesinfo")
 }
@@ -298,6 +298,7 @@ model Additive {
   id               Int                @id @default(autoincrement())
   contract_id      Int                @unique
   newValue         Int
+  oldValue         Int
   created          DateTime           @default(now())
   updated          DateTime           @updatedAt
   Contracts        Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
@@ -315,4 +316,23 @@ model Additive_Clauses {
   Additive    Additive @relation(fields: [additive_id], references: [id], onDelete: Cascade)
 
   @@map("additive_clauses")
+}
+
+model Role {
+  id      Int                  @id @default(autoincrement())
+  name    String               @unique
+  created DateTime             @default(now())
+  updated DateTime             @updatedAt
+  users   EmployeesInfoRoles[]
+
+  @@map("role")
+}
+
+model EmployeesInfoRoles {
+  employee   EmployeesInfo @relation(fields: [employeeId], references: [id])
+  role       Role          @relation(fields: [roleId], references: [id])
+  employeeId Int
+  roleId     Int
+
+  @@id([employeeId, roleId])
 }

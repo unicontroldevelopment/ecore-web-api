@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+  import express, { Router } from 'express';
 import multer from 'multer';
 import AdditiveOrReajustmentController from "./controllers/AdditiveOrReajustmentController";
 import ContractSignatureController from "./controllers/ContractSignatureController";
@@ -24,9 +24,9 @@ import {
 } from "./services/D4SignService";
 import { converteValorExtensoHandler, updatePdf, uploadPdf } from "./services/UtilsService";
 
-const app = express();
-const routes = Router();
-const upload = multer();
+  const app = express();
+  const routes = Router();
+  const upload = multer();
 
 routes.post("/login", EmployeeController.login);
 //routes.use(authMiddlewares);
@@ -79,7 +79,7 @@ routes.put("/contractSign/:id", ContractSignatureController.update);
 
 routes.get("/listarTodosOsDocumentos", listarDocumentos);
 routes.post("/enviarDocumentoParaAssinar", enviarDocumentoParaAssinar);
-routes.post("/cadastrarDocumento", cadastrarDocumento);
+routes.post("/cadastrarDocumento", upload.none(), cadastrarDocumento);
 routes.post("/cancelarDocumento", cancelarDocumento);
 routes.get("/buscarDocumentosDoCofre", buscarDocumentosDoCofre);
 routes.get("/buscarDocumentosDoCofrePorId", buscarDocumentosDoCofrePorId);

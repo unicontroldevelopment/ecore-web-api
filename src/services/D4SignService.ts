@@ -163,7 +163,6 @@ export const enviarDocumentoParaAssinar = (
   res: Response
 ): void => {
   const { id_document, message, skip_email, workflow } = req.body;
-  console.log("Inicio", req.body);
   
 
   const options = {
@@ -206,17 +205,27 @@ export const enviarDocumentoParaAssinar = (
 export const cadastrarDocumento = (req: Request, res: Response): void => {
   const { name, file, contractId } = req.body;
 
+  const contractInt = parseInt(contractId);
+
   try {
+
+    const base64File = file.replace(/^data:application\/pdf;base64,/, '');
+    const fileBuffer = Buffer.from(base64File, 'base64');
+
+    if (fileBuffer.length > 50 * 1024 * 1024) {
+      res.status(413).json({ message: "File size exceeds limit" });
+      return;
+    }
+
     const options = {
       method: "POST",
       url: `https://${process.env.D4SIGN_AMBIENTE_TESTE}.d4sign.com.br/api/v1/documents/${process.env.ID_COFRE}/uploadbinary?tokenAPI=${process.env.D4SIGN_API_TOKEN}&cryptKey=${process.env.D4SIGN_CRYPT_KEY}`,
-
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: {
-        base64_binary_file: file,
+        base64_binary_file: base64File,
         mime_type: "application/pdf",
         name: name,
       },
@@ -231,26 +240,22 @@ export const cadastrarDocumento = (req: Request, res: Response): void => {
       try {
         await prisma.contracts.update({
           where: {
-            id: contractId,
+            id: contractInt,
           },
           data: {
             d4sign: id_doc,
           },
         });
-        return res
-          .status(200)
-          .json({
-            message: "Documento cadastrado com sucesso",
-            d4sign: id_doc,
-          });
+        return res.status(200).json({
+          message: "Documento cadastrado com sucesso",
+          d4sign: id_doc,
+        });
       } catch (dbError) {
         console.error("Error updating contract in database:", dbError);
-        return res
-          .status(500)
-          .json({
-            message: "Error updating contract in database",
-            error: dbError,
-          });
+        return res.status(500).json({
+          message: "Error updating contract in database",
+          error: dbError,
+        });
       }
     });
   } catch (error) {
