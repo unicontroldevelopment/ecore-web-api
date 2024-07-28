@@ -3,12 +3,16 @@ import { sign } from "jsonwebtoken";
 import prisma from "../database/prisma";
 import EmployeeService from "../services/EmployeeService";
 
+
+interface User {
+  name: string;
+}
 class EmployeeController {
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
 
-      const user = await prisma.employees.findUnique({
+      const user = await prisma.employeesInfo.findUnique({
         where: { email: email },
       });
 
@@ -26,7 +30,7 @@ class EmployeeController {
 
       const { id } = userLogin;
 
-      const loggedUser = await EmployeeService.getById(id);
+      const loggedUser = await EmployeeService.getByIdInfo(id);
 
       return res.status(200).json({ user: loggedUser, token });
     } catch (error) {
@@ -35,7 +39,7 @@ class EmployeeController {
     }
   }
 
-  async create(req: Request, res: Response) {
+  async createInfo(req: Request, res: Response) {
     try {
       const {
         role,
@@ -57,9 +61,10 @@ class EmployeeController {
         coolerProperty,
         officeVersion,
         windowsVersion,
+        employeeId
       } = req.body;
 
-      const user = await EmployeeService.create(
+      const user = await EmployeeService.createInfo(
         role,
         name,
         password,
@@ -78,7 +83,179 @@ class EmployeeController {
         notebookProperty,
         coolerProperty,
         officeVersion,
-        windowsVersion
+        windowsVersion,
+        employeeId
+      );
+
+      return res
+        .status(201)
+        .json({ user, message: "Funcionário criado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error });
+    }
+  }
+
+  async getByIdInfo(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
+      }
+
+      const user = await EmployeeService.getByIdInfo(userId);
+
+      return res.status(200).json({ user, message: "Funcionário encontrado." });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async deleteInfo(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
+      }
+
+      const user = await EmployeeService.deleteInfo(userId);
+
+      return res
+        .status(200)
+        .json({ user, message: "Funcionário deletado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async updateInfo(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const existedUser = await prisma.employees.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
+      }
+
+      const updateData = await req.body;
+      
+      const {role , ...restOfData} = updateData;
+
+      const updatedUser = await EmployeeService.updateInfo(userId, restOfData, role);
+
+      return res
+        .status(200)
+        .json({ updatedUser, message: "Funcionário atualizado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async getAllInfo(req: Request, res: Response) {
+    try {
+      const { role, name, department, company, unit } = req.query;
+
+      const listUsers = await EmployeeService.getAllInfo(
+        role?.toString(),
+        name?.toString(),
+        department?.toString(),
+        company?.toString(),
+        unit?.toString()
+      );
+
+      if (!listUsers) {
+        return res.status(500).json({ message: "Não há funcionários!" });
+      }
+
+      return res
+        .status(200)
+        .json({ listUsers, message: "Funcionários listados com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+  async create(req: Request, res: Response) {
+    try {
+      const {
+        name,
+        birthday,
+        cpf,
+        ctps,
+        serie,
+        office,
+        cbo,
+        education,
+        maritalStatus,
+        nationality,
+        pis,
+        rg,
+        cep,
+        road,
+        number,
+        complement,
+        neighborhood,
+        city,
+        state,
+        level,
+        department,
+        company,
+        costCenter,
+        dateAdmission,
+        dateResignation,
+        initialWage,
+        currentWage
+      } = req.body;
+
+      const intoInt = ((string: string) => {
+        const stringInt = parseInt(string);
+        return stringInt
+      })
+
+      const user = await EmployeeService.create(
+        name,
+        birthday,
+        cpf,
+        ctps,
+        serie,
+        office,
+        intoInt(cbo),
+        education,
+        maritalStatus,
+        nationality,
+        pis,
+        rg,
+        cep,
+        road,
+        intoInt(number),
+        complement,
+        neighborhood,
+        city,
+        state,
+        level,
+        department,
+        company,
+        costCenter,
+        dateAdmission,
+        dateResignation,
+        initialWage,
+        currentWage
       );
 
       return res
@@ -161,14 +338,11 @@ class EmployeeController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { role, name, department, company, unit } = req.query;
+      const { name, office } = req.query;  
 
       const listUsers = await EmployeeService.getAll(
-        role?.toString(),
         name?.toString(),
-        department?.toString(),
-        company?.toString(),
-        unit?.toString()
+        office?.toString()
       );
 
       if (!listUsers) {

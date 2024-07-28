@@ -11,35 +11,74 @@ datasource db {
 }
 
 model Employees {
-  id                Int      @id @default(autoincrement())
-  name              String
-  role              String?
-  password          String?
-  department        String?
-  company           String?
-  unit              String?
-  networkUser       String?
-  networkPassword   String?
-  email             String @unique
-  emailPassword     String?
-  discordEmail      String?
-  discordPassword   String?
-  notebookBrand     String?
-  notebookName      String?
-  notebookProperty  String?
-  coolerProperty    String?
-  officeVersion     String?
-  windowsVersion    String?
-  created           DateTime @default(now())
-  updated           DateTime @updatedAt
+  id              Int       @id @default(autoincrement())
+  name            String
+  birthday        DateTime?
+  cpf             String    @unique
+  ctps            String?
+  serie           String?
+  office          String?
+  cbo             Int?
+  education       String?
+  maritalStatus   String?
+  nationality     String?
+  pis             String?
+  rg              String?
+  cep             String?
+  road            String?
+  number          Int?
+  complement      String?
+  neighborhood    String?
+  city            String?
+  state           String?
+  level           String?
+  department      String?
+  company         String?
+  costCenter      String?
+  dateAdmission   DateTime?
+  dateResignation DateTime?
+  initialWage     Decimal?  @db.Decimal(10, 2)
+  currentWage     Decimal?  @db.Decimal(10, 2)
+  created         DateTime  @default(now())
+  updated         DateTime  @updatedAt
 
-  ServerAccess ServerAccess[]
+  EmployeesInfo EmployeesInfo[]
 
   @@map("employees")
 }
 
+model EmployeesInfo {
+  id               Int                  @id @default(autoincrement())
+  name             String
+  password         String?
+  department       String?
+  company          String?
+  unit             String?
+  networkUser      String?
+  networkPassword  String?
+  email            String               @unique
+  emailPassword    String?
+  discordEmail     String?
+  discordPassword  String?
+  notebookBrand    String?
+  notebookName     String?
+  notebookProperty String?
+  coolerProperty   String?
+  officeVersion    String?
+  windowsVersion   String?
+  employeeId       Int
+  created          DateTime             @default(now())
+  updated          DateTime             @updatedAt
+  Employees        Employees            @relation(fields: [employeeId], references: [id])
+  ServerAccess     ServerAccess[]
+  logs             LogEntry[]
+  role             EmployeesInfoRoles[]
+
+  @@map("employeesinfo")
+}
+
 model ServerAccess {
-  id                Int     @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   fitolog           Boolean
   commercial        Boolean
   administrative    Boolean
@@ -53,10 +92,247 @@ model ServerAccess {
   it                Boolean
   temp              Boolean
   franchises        Boolean
-  created           DateTime @default(now())
-  updated           DateTime @updatedAt
-  employeeId        Int
-  Employees         Employees @relation(fields: [employeeId], references: [id])
+  created           DateTime      @default(now())
+  updated           DateTime      @updatedAt
+  employeeInfoId    Int
+  EmployeesInfo     EmployeesInfo @relation(fields: [employeeInfoId], references: [id])
 
   @@map("serverAccess")
+}
+
+model Emails {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  type     String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+
+  Redirects Redirects[]
+
+  @@map("email")
+}
+
+model Redirects {
+  id       Int      @id @default(autoincrement())
+  email    String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+  email_id Int
+  Emails   Emails   @relation(fields: [email_id], references: [id])
+
+  @@map("redirects")
+}
+
+model Contracts {
+  id             Int      @id @default(autoincrement())
+  status         String
+  d4sign         String?  @unique
+  name           String
+  cpfcnpj        String
+  cep            String
+  road           String
+  number         Int
+  complement     String?
+  neighborhood   String
+  city           String
+  state          String
+  contractNumber Int
+  date           DateTime
+  value          Decimal  @db.Decimal(8, 2)
+  index          String
+  created        DateTime @default(now())
+  updated        DateTime @updatedAt
+
+  signOnContract    SignOnContract[]
+  contracts_Service Contract_Service[]
+  clauses           Clauses[]
+  additive          Additive?
+  reajustment       Reajustment?
+  propouse          Propouse?
+
+  @@map("contracts")
+}
+
+model Clauses {
+  id          Int       @id @default(autoincrement())
+  description String    @db.LongText
+  contract_id Int
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+
+  @@map("clauses")
+}
+
+model Propouse {
+  id          Int       @id @default(autoincrement())
+  file        Bytes     @db.LongBlob
+  fileName    String
+  contract_id Int       @unique
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+
+  @@map("propouse")
+}
+
+model Contract_Service {
+  id          Int       @id @default(autoincrement())
+  contract_id Int
+  service_id  Int
+  created     DateTime  @default(now())
+  updated     DateTime  @updatedAt
+  Services    Services  @relation(fields: [service_id], references: [id])
+  Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+
+  @@map("contract_service")
+}
+
+model Services {
+  id          Int      @id @default(autoincrement())
+  description String
+  code        String
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+
+  contracts_Service Contract_Service[]
+
+  @@map("services")
+}
+
+model SignOnContract {
+  id                 Int                @id @default(autoincrement())
+  contract_id        Int
+  sign_id            Int
+  created            DateTime           @default(now())
+  updated            DateTime           @updatedAt
+  Contract           Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  Contract_Signature Contract_Signature @relation(fields: [sign_id], references: [id])
+
+  @@map("signoncontract")
+}
+
+model Contract_Signature {
+  id              Int    @id @default(autoincrement())
+  cpf             String
+  email           String
+  phone           String
+  address         String
+  socialReason    String
+  cnpj            String
+  responsibleName String
+  state           String
+  city            String
+
+  SignOnContract SignOnContract[]
+
+  @@map("contract_signature")
+}
+
+model Uniform {
+  id              Int        @id @default(autoincrement())
+  name            String
+  size            String
+  unit            String
+  quantity        Int
+  quantityMinimum Int
+  numberNF        String
+  baseValue       Float
+  barCode         String
+  created         DateTime   @default(now())
+  updated         DateTime   @updatedAt
+  logs            LogEntry[]
+
+  @@map("uniform")
+}
+
+model Product {
+  id                Int        @id @default(autoincrement())
+  name              String
+  unitOfMeasurement String
+  unit              String
+  quantity          Int
+  quantityMinimum   Int
+  numberNF          String
+  baseValue         Float
+  barCode           String
+  created           DateTime   @default(now())
+  updated           DateTime   @updatedAt
+  logs              LogEntry[]
+
+  @@map("product")
+}
+
+model LogEntry {
+  id        Int           @id @default(autoincrement())
+  action    String
+  quantity  Int
+  timestamp DateTime      @default(now())
+  itemType  String // "uniform" or "product"
+  itemId    Int
+  userId    Int
+  unit      String
+  created   DateTime      @default(now())
+  updated   DateTime      @updatedAt
+  user      EmployeesInfo @relation(fields: [userId], references: [id])
+  Product   Product?      @relation(fields: [itemId], references: [id], map: "ProductItemId")
+  Uniform   Uniform?      @relation(fields: [itemId], references: [id], map: "UniformItemId")
+
+  @@map("logentry")
+}
+
+model Reajustment {
+  id            Int       @id @default(autoincrement())
+  contract_id   Int       @unique
+  valueContract Int
+  index         Float
+  created       DateTime  @default(now())
+  updated       DateTime  @updatedAt
+  Contracts     Contracts @relation(fields: [contract_id], references: [id])
+
+  @@map("reajustment")
+}
+
+model Additive {
+  id               Int                @id @default(autoincrement())
+  contract_id      Int                @unique
+  newValue         Int
+  oldValue         Int
+  created          DateTime           @default(now())
+  updated          DateTime           @updatedAt
+  Contracts        Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  additive_Clauses Additive_Clauses[]
+
+  @@map("additive")
+}
+
+model Additive_Clauses {
+  id          Int      @id @default(autoincrement())
+  description String   @db.LongText
+  additive_id Int
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+  Additive    Additive @relation(fields: [additive_id], references: [id], onDelete: Cascade)
+
+  @@map("additive_clauses")
+}
+
+model Role {
+  id      Int                  @id @default(autoincrement())
+  name    String               @unique
+  created DateTime             @default(now())
+  updated DateTime             @updatedAt
+  users   EmployeesInfoRoles[]
+
+  @@map("role")
+}
+
+model EmployeesInfoRoles {
+  employee   EmployeesInfo @relation(fields: [employeeId], references: [id])
+  role       Role          @relation(fields: [roleId], references: [id])
+  employeeId Int
+  roleId     Int
+
+  @@id([employeeId, roleId])
 }
