@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/app.ts"
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "heroku-postbuild": "npx prisma generate && npx prisma db push",
+    "start": "node app.ts"
   },
   "keywords": [],
   "author": "",
