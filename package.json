@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
     "heroku-postbuild": "npx prisma generate && npx prisma db push",
-    "start": "node app.ts"
+    "start": "ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",
