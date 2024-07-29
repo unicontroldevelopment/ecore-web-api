@@ -2,12 +2,12 @@
   "name": "ecore-web-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
     "heroku-postbuild": "npx prisma generate && npx prisma db push",
-    "serve": "node dist/index.js",
-    "start": "node dist/index.js",
+    "serve": "node dist/app.js",
+    "start": "node dist/app.js",
     "build": "tsc",
     "postinstall": "npm run build"
   },
