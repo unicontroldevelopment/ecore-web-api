@@ -24,6 +24,7 @@ import {
   removerAssinaturaDoDocumento,
 } from "./services/D4SignService";
 import {
+  buscaCep,
   converteValorExtensoHandler,
   updatePdf,
   uploadPdf,
@@ -114,6 +115,7 @@ routes.delete("/uniform/:id", UniformController.delete);
 routes.put("/uniform/:id", UniformController.update);
 
 routes.post("/valueExtensible", converteValorExtensoHandler);
+routes.post("/cep", buscaCep);
 routes.post("/upload", upload.single("file"), uploadPdf);
 routes.put("/updatePDF", upload.single("file"), updatePdf);
 
