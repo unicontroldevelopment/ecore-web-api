@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import prisma from "../database/prisma";
+const busca_cep = require("busca-cep");
 
 const numero_extenso = require("numero-por-extenso");
 
-// Converte valor para extenso
 export const converteValorExtensoHandler = (
   req: Request,
   res: Response
@@ -41,6 +41,23 @@ export const uploadPdf = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+//Busca CEP
+export const buscaCep = async (req: Request, res: Response) => {
+  const { cep } = req.body;
+  if (cep.length < 9) {
+    res.json(false);
+  } else {
+    busca_cep(cep)
+      .then((endereco: string) => {
+        res.json(endereco);
+      })
+      .catch((error: Error) => {
+        res.json(error);
+      });
+  }
+};
+
 export const updatePdf = async (req: Request, res: Response) => {
   try {
     const { id } = req.body;
