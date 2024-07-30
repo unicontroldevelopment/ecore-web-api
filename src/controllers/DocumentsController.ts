@@ -205,7 +205,7 @@ class DocumentsController {
 
       const updateData = await req.body;
       
-      const { signOnContract, clauses, contracts_Service, ...contractData} = updateData;
+      const { id, signOnContract, clauses, contracts_Service, ...contractData} = updateData;
       
 
       const updatedContract = await DocumentsService.updateContract(contractId, contractData, contracts_Service, clauses, signOnContract);

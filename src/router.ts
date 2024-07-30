@@ -8,6 +8,7 @@ import EmployeeController from "./controllers/EmployeeController";
 import ProductController from "./controllers/ProductController";
 import ServerAccessController from "./controllers/ServerAccessController";
 import UniformController from "./controllers/UniformController";
+import authMiddlewares from "./middlewares/auth";
 import {
   buscarDocumentosDoCofre,
   buscarDocumentosDoCofrePorId,
@@ -33,7 +34,7 @@ const routes = Router();
 const upload = multer();
 
 routes.post("/login", EmployeeController.login);
-//routes.use(authMiddlewares);
+routes.use(authMiddlewares);
 routes.post("/employee", EmployeeController.create);
 routes.get("/employees", EmployeeController.getAll);
 routes.get("/employee/:id", EmployeeController.getById);

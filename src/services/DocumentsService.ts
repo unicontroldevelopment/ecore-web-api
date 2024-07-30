@@ -153,21 +153,6 @@ class DocumentsService {
             contract_id: true,
           }
         },
-        additive: {
-          select: {
-            id: true,
-            contract_id: true,
-            newValue: true,
-            oldValue: true,
-            additive_Clauses: {
-              select: {
-                id: true,
-                description: true,
-                additive_id: true,
-              }
-            }
-          }
-        }
       },
     });
 
