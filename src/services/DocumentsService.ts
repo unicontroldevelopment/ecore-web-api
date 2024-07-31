@@ -89,30 +89,14 @@ class DocumentsService {
   async getContracts(type?: string) {
     const users = await prisma.contracts.findMany({
       where: {
-        AND: [
-          {
-            name: {
-              contains: type ? type : "",
-            },
-          },
-        ],
+        name: {
+          contains: type ? type : "",
+        },
       },
       orderBy: {
         created: "asc",
       },
-      select: {
-        id: true,
-        status: true,
-        d4sign: true,
-        name: true,
-        cpfcnpj: true,
-        cep: true,
-        road: true,
-        number: true,
-        complement: true,
-        neighborhood: true,
-        city: true,
-        state: true,
+      include: {
         signOnContract: {
           select: {
             id: true,
@@ -121,10 +105,6 @@ class DocumentsService {
             Contract_Signature: true,
           }
         },
-        contractNumber: true,
-        date: true,
-        value: true,
-        index: true,
         contracts_Service: {
           select: {
             id: true,
