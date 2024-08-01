@@ -27,13 +27,10 @@ class AdditiveOrReajustmentController {
         clauses
       } = req.body;
 
-      const contractId = parseInt(contract_id);
-      const valueInt = parseInt(newValue);
-      const oldValueInt = parseInt(oldValue)
 
       const contract = await AdditiveOrReajustmentService.createAdditive(
-        contractId,
-        valueInt,
+        contract_id,
+        newValue,
         oldValue,
         clauses
       );
