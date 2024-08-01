@@ -68,17 +68,22 @@ export const updatePdf = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const updatedFile = await prisma.propouse.update({
+    const updatedOrCreatedFile = await prisma.propouse.upsert({
       where: { contract_id: idInt },
-      data: {
+      update: {
+        file: file.buffer,
+        fileName: file.originalname,
+      },
+      create: {
+        contract_id: idInt,
         file: file.buffer,
         fileName: file.originalname,
       },
     });
 
-    res.status(200).json(updatedFile);
+    res.status(200).json(updatedOrCreatedFile);
   } catch (error) {
-    console.error("Error updating file:", error);
+    console.error("Error updating or creating file:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
