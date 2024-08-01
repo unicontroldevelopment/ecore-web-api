@@ -30,7 +30,7 @@ interface ContractServiceInput {
 class AdditiveOrReajustmentService {
   async createAdditive(contractId: number, newValue: number, oldValue: number, clauses: ClauseInput[]) {
     const userAlreadyExists = await prisma.contracts.findFirst({
-      where: { contractNumber: contractId },
+      where: { id: contractId },
     });
 
     if (userAlreadyExists) {

@@ -132,12 +132,12 @@ model Contracts {
   cpfcnpj        String
   cep            String
   road           String
-  number         Int
+  number         String
   complement     String?
   neighborhood   String
   city           String
   state          String
-  contractNumber Int
+  contractNumber String
   date           DateTime
   value          Decimal  @db.Decimal(8, 2)
   index          String
@@ -335,6 +335,5 @@ model EmployeesInfoRoles {
   roleId     Int
 
   @@id([employeeId, roleId])
-
   @@map("employeesInfoRoles")
 }
