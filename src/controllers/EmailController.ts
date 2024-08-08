@@ -92,7 +92,7 @@ class EmailController {
       const { Redirects, ...emailData} = updateData;
       
 
-      const updatedUser = await EmailService.update(userId, emailData);
+      const updatedUser = await EmailService.update(userId, emailData, Redirects);
 
       return res
         .status(200)
