@@ -41,6 +41,7 @@ class EmailService {
           select: {
             id: true,
             email_id: true,
+            email: true,
           },
         },
       },
@@ -84,13 +85,26 @@ class EmailService {
 
     return user;
   }
-  async update(id: number, updateData: EmailsUpdateInput) {
+  async update(id: number, updateData: EmailsUpdateInput, Redirects: RedirectsInput[]) {
     const user = await prisma.emails.update({
       where: {
         id: id,
       },
       data: updateData,
     });
+
+    if (Redirects && Redirects.length > 0) {
+      await prisma.redirects.deleteMany({ where: { email_id: id } });
+  
+      for (const redirect of Redirects) {
+        await prisma.redirects.create({
+          data: {
+            email: redirect.email,
+            email_id: id,
+          },
+        });
+      }
+    }
 
     return user;
   }
