@@ -86,6 +86,23 @@ class DocumentsService {
 
     return user;
   }
+  async getByIdContract(id: number) {
+    const user = await prisma.contracts.findUnique({
+      where: { id },
+      select: {
+          propouse: {
+            select: {
+              id: true,
+              file: true,
+              fileName: true,
+              contract_id: true,
+            }
+          },
+        },
+    });
+
+    return user;
+  }
   async getContracts(type?: string) {
     const users = await prisma.contracts.findMany({
       where: {
@@ -124,14 +141,6 @@ class DocumentsService {
             contract_id: true,
             description: true,
           },
-        },
-        propouse: {
-          select: {
-            id: true,
-            file: true,
-            fileName: true,
-            contract_id: true,
-          }
         },
       },
     });

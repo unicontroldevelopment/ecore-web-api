@@ -217,6 +217,27 @@ class DocumentsController {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    try {
+      const Id = parseInt(req.params.id);
+
+      const existedUser = await prisma.contracts.findUnique({
+        where: { id: Id },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Contrato não encontrado!" });
+      }
+
+      const user = await DocumentsService.getByIdContract(Id);
+
+      return res.status(200).json({ user, message: "Contrato encontrado." });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
   async getContracts(req: Request, res: Response) {
     try {
       const { type } = req.query;
