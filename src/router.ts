@@ -32,7 +32,11 @@ import {
 
 const app = express();
 const routes = Router();
-const upload = multer();
+const upload = multer({
+  limits: {
+    fieldSize: 50 * 1024 * 1024,
+  },
+});
 
 routes.post("/login", EmployeeController.login);
 routes.use(authMiddlewares);
