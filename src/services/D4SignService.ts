@@ -385,6 +385,7 @@ export const buscarDocumentosDoCofrePorId = (
 // Função para fazer o download de um documento
 export const downloadDeDocumento = (req: Request, res: Response): void => {
   const { id_doc } = req.body;
+  
 
   const options = {
     method: "POST",
@@ -409,7 +410,7 @@ export const downloadDeDocumento = (req: Request, res: Response): void => {
     }
 
     try {
-      const contract = JSON.parse(body);
+      const contract = typeof body === "string" ? JSON.parse(body) : body;
       res.status(200).json({ contract, message: "Signatarios localizados!" });
     } catch (parseError) {
       res
