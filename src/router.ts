@@ -26,7 +26,9 @@ import {
 import {
   buscaCep,
   converteValorExtensoHandler,
+  updateAdditivePdf,
   updatePdf,
+  uploadAdditivePdf,
   uploadPdf,
 } from "./services/UtilsService";
 
@@ -71,6 +73,7 @@ routes.put("/service/:id", DocumentsController.updateService);
 routes.post("/contract", DocumentsController.createContract);
 routes.get("/contracts", DocumentsController.getContracts);
 routes.get("/contract/:id", DocumentsController.getById);
+routes.get("/contractInfo/:id", DocumentsController.getByIdAllInfo);
 routes.delete("/contract/:id", DocumentsController.deleteContract);
 routes.put("/contract/:id", DocumentsController.updateContract);
 
@@ -123,5 +126,7 @@ routes.post("/valueExtensible", converteValorExtensoHandler);
 routes.post("/cep", buscaCep);
 routes.post("/upload", upload.single("file"), uploadPdf);
 routes.put("/updatePDF", upload.single("file"), updatePdf);
+routes.post("/uploadAdditive", upload.single("file"), uploadAdditivePdf);
+routes.put("/updateAdditivePDF", upload.single("file"), updateAdditivePdf);
 
 export default routes;

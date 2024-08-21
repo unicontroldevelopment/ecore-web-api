@@ -42,14 +42,40 @@ export const uploadPdf = async (req: Request, res: Response) => {
   }
 }
 
+export const uploadAdditivePdf = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const idInt = parseInt(id);
+    const { file } = req;
+    
+
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const savedFile = await prisma.propouseAdditive.create({
+      data: {
+        additive_id: idInt,
+        file: file.buffer,
+        fileName: file.originalname,
+      },
+    });
+
+    res.status(201).json(savedFile);
+  } catch (error) {
+    console.error("Error saving file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 //Busca CEP
 export const buscaCep = async (req: Request, res: Response) => {
   const { cep } = req.body;
   if (cep.length < 9) {
     res.json(false);
-  } else {
+  } else { 
     busca_cep(cep)
-      .then((endereco: string) => {
+      .then((endereco: string) => {  
         res.json(endereco);
       })
       .catch((error: Error) => {
@@ -87,3 +113,33 @@ export const updatePdf = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateAdditivePdf = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const idInt = parseInt(id);
+    const { file } = req;
+
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const updatedOrCreatedFile = await prisma.propouseAdditive.upsert({
+      where: { additive_id: idInt },
+      update: {
+        file: file.buffer,
+        fileName: file.originalname,
+      },
+      create: {
+        additive_id: idInt,
+        file: file.buffer,
+        fileName: file.originalname,
+      },
+    });
+
+    res.status(200).json(updatedOrCreatedFile);
+  } catch (error) {
+    console.error("Error updating or creating file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}

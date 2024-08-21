@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
+    "heroku-postbuild": "npx prisma db push",
     "start": "node dist/app.js",
     "build": "tsc",
     "postinstall": "npm run build"
@@ -17,6 +18,7 @@
     "@types/request": "^2.48.12",
     "bcryptjs": "^2.4.3",
     "busca-cep": "^0.5.0",
+    "cep-promise": "^4.4.1",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -24,9 +26,9 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "numero-por-extenso": "^1.0.8",
-    "ts-node": "^10.9.2",
     "qs": "^6.11.2",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
