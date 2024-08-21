@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
-    "heroku-postbuild": "npx prisma db push",
+    "heroku-postbuild": "npx prisma db push --accept-data-loss",
     "start": "node dist/app.js",
     "build": "tsc",
     "postinstall": "npm run build"
