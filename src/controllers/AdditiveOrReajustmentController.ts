@@ -27,17 +27,20 @@ class AdditiveOrReajustmentController {
         clauses
       } = req.body;
 
+      const idInt = parseInt(contract_id)
+      const newValueFormat = newValue.replace(/\./g, "").replace(",", ".");
+      const oldValueFormat = oldValue.replace(/\./g, "").replace(",", ".");
 
       const contract = await AdditiveOrReajustmentService.createAdditive(
-        contract_id,
-        newValue,
-        oldValue,
+        idInt,
+        newValueFormat,
+        oldValueFormat,
         clauses
       );
 
       return res
         .status(201)
-        .json({ contract, message: "Reajuste criado com sucesso!" });
+        .json({ contract, message: "Aditivo criado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error });
@@ -69,21 +72,25 @@ class AdditiveOrReajustmentController {
 
   async updateAdditive(req: Request, res: Response) {
     try {
-      const contractId = parseInt(req.params.id);
+      const additiveId = parseInt(req.params.id);
 
       const existedContract = await prisma.additive.findUnique({
-        where: { id: contractId },
+        where: { id: additiveId },
       });
 
       if (!existedContract) {
         return res.status(500).json({ message: "Aditivo não encontrado!" });
       }
 
-      const updateData = await req.body;
-      const { signOnContract, clauses, contracts_Service, ...contractData} = updateData;
+      const {additive_Clauses, ...updateData} = await req.body;
+
+      if(updateData.newValue && updateData.oldValue) {
+        updateData.newValue = parseFloat(updateData.newValue.replace(/\./g, '').replace(',', '.')).toString();
+        updateData.oldValue = parseFloat(updateData.oldValue.replace(/\./g, '').replace(',', '.')).toString();
+      }
       
 
-      const updatedContract = await AdditiveOrReajustmentService.updateAdditive(contractId, contractData, contracts_Service, clauses, signOnContract);
+      const updatedContract = await AdditiveOrReajustmentService.updateAdditive(additiveId, updateData, additive_Clauses);
 
       return res
         .status(200)
@@ -97,17 +104,24 @@ class AdditiveOrReajustmentController {
     try {
       const {
         contract_id,
-        newValue,
-        index
+        value,
+        index,
+        type
       } = req.body;
 
+      console.log(index);
+      
       const contractId = parseInt(contract_id);
-      const valueInt = parseInt(newValue);
+      const indexFormat = index.replace(/\./g, "").replace(",", ".");
+      const indexInt = parseFloat(indexFormat);
+      const valueFormat = value.replace(/\./g, "").replace(",", ".");
+      
 
       const contract = await AdditiveOrReajustmentService.createReajustment(
         contractId,
-        valueInt,
-        index
+        valueFormat,
+        indexInt,
+        type
       );
 
       return res
@@ -128,14 +142,14 @@ class AdditiveOrReajustmentController {
       });
 
       if (!existedContract) {
-        return res.status(500).json({ message: "Aditivo não encontrado!" });
+        return res.status(500).json({ message: "Reajuste não encontrado!" });
       }
 
       const contract = await AdditiveOrReajustmentService.deleteReajustment(contractId);
 
       return res
         .status(200)
-        .json({ contract, message: "Aditivo deletado com sucesso!" });
+        .json({ contract, message: "Reajuste deletado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -144,25 +158,43 @@ class AdditiveOrReajustmentController {
 
   async updateReajustment(req: Request, res: Response) {
     try {
-      const contractId = parseInt(req.params.id);
+      const reajustmentId = parseInt(req.params.id);
 
-      const existedContract = await prisma.reajustment.findUnique({
-        where: { id: contractId },
+      const existedReajustment = await prisma.reajustment.findUnique({
+        where: { id: reajustmentId },
       });
 
-      if (!existedContract) {
-        return res.status(500).json({ message: "Aditivo não encontrado!" });
+      if (!existedReajustment) {
+        return res.status(500).json({ message: "Reajuste não encontrado!" });
       }
 
       const updateData = await req.body;
-      const { signOnContract, clauses, contracts_Service, ...contractData} = updateData;
-      
 
-      const updatedContract = await AdditiveOrReajustmentService.updateReajustment(contractId, contractData, contracts_Service, clauses, signOnContract);
+      const {index, contract_id, value, id, ...data } = updateData;
+      let floatIndex: number;
+      let floatValue: number;
+      
+      if (index.includes(",")) {
+        const indexFormat = index.replace(/\./g, "").replace(",", ".");
+        floatIndex = parseFloat(indexFormat);
+      } else {
+        floatIndex = parseFloat(index);
+      }
+      
+      if (value.includes(",")) {
+        const valueFormat = value.replace(/\./g, "").replace(",", ".");
+        floatValue = parseFloat(valueFormat);
+      } else {
+        floatValue = parseFloat(value);
+      }
+
+      const updateDataReajustment = {index: floatIndex, valueContract: floatValue, ...data}
+
+      const updatedContract = await AdditiveOrReajustmentService.updateReajustment(reajustmentId, updateDataReajustment);
 
       return res
         .status(200)
-        .json({ updatedContract, message: "Aditivo atualizado com sucesso!" });
+        .json({ updatedContract, message: "Reajuste atualizado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });

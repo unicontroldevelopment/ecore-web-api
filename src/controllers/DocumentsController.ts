@@ -17,22 +17,12 @@ interface ClauseInput {
   description: string;
 }
 
-const base64ToBuffer = (base64: string): Buffer => {
-  return Buffer.from(base64, 'base64');
-};
-
 class DocumentsController {
   async createService(req: Request, res: Response) {
     try {
-      const {
-        description,
-        code
-      } = req.body;
+      const { description, code } = req.body;
 
-      const service = await DocumentsService.createService(
-        description,
-        code
-      );
+      const service = await DocumentsService.createService(description, code);
 
       return res
         .status(201)
@@ -79,10 +69,12 @@ class DocumentsController {
       }
 
       const updateData = await req.body;
-      const { Redirects, ...serviceData} = updateData;
-      
+      const { Redirects, ...serviceData } = updateData;
 
-      const updatedService = await DocumentsService.updateService(serviceId, serviceData);
+      const updatedService = await DocumentsService.updateService(
+        serviceId,
+        serviceData
+      );
 
       return res
         .status(200)
@@ -97,9 +89,7 @@ class DocumentsController {
     try {
       const { type } = req.query;
 
-      const listServices = await DocumentsService.getServices(
-        type?.toString(),
-      );
+      const listServices = await DocumentsService.getServices(type?.toString());
 
       if (!listServices) {
         return res.status(500).json({ message: "Não há serviços!" });
@@ -132,11 +122,13 @@ class DocumentsController {
         index,
         signOnContract,
         servicesContract,
-        clauses
+        clauses,
       } = req.body;
-  
+
       const signNumber = parseInt(signOnContract, 10);
-  
+      const floatValue = parseFloat(value.replace(/\./g, '').replace(',', '.')).toString();
+
+
       const contract = await DocumentsService.createContract(
         status,
         name,
@@ -150,13 +142,13 @@ class DocumentsController {
         state,
         contractNumber,
         date,
-        value,
+        floatValue,
         index,
         signNumber,
         servicesContract,
-        clauses,
+        clauses
       );
-  
+
       return res
         .status(201)
         .json({ contract, message: "Contrato criado com sucesso!" });
@@ -202,11 +194,28 @@ class DocumentsController {
       }
 
       const updateData = await req.body;
-      
-      const { id, signOnContract, clauses, contracts_Service, ...contractData} = updateData;
-      
 
-      const updatedContract = await DocumentsService.updateContract(contractId, contractData, contracts_Service, clauses, signOnContract);
+      const {
+        id,
+        signOnContract,
+        clauses,
+        contracts_Service,
+        ...contractData
+      } = updateData;
+
+      if (contractData.value) {
+        contractData.value = parseFloat(
+          contractData.value.replace(/\./g, "").replace(",", ".")
+        );
+      }
+
+      const updatedContract = await DocumentsService.updateContract(
+        contractId,
+        contractData,
+        contracts_Service,
+        clauses,
+        signOnContract
+      );
 
       return res
         .status(200)
@@ -238,12 +247,33 @@ class DocumentsController {
     }
   }
 
+  async getByIdAllInfo(req: Request, res: Response) {
+    try {
+      const Id = parseInt(req.params.id);
+
+      const existedUser = await prisma.contracts.findUnique({
+        where: { id: Id },
+      });
+
+      if (!existedUser) {
+        return res.status(500).json({ message: "Contrato não encontrado!" });
+      }
+
+      const user = await DocumentsService.getByIdContractAllInfo(Id);
+
+      return res.status(200).json({ user, message: "Contrato encontrado." });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
   async getContracts(req: Request, res: Response) {
     try {
       const { type } = req.query;
 
-      const listContracts= await DocumentsService.getContracts(
-        type?.toString(),
+      const listContracts = await DocumentsService.getContracts(
+        type?.toString()
       );
 
       if (!listContracts) {

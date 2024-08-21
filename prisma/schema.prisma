@@ -147,8 +147,8 @@ model Contracts {
   signOnContract    SignOnContract[]
   contracts_Service Contract_Service[]
   clauses           Clauses[]
-  additive          Additive?
-  reajustment       Reajustment?
+  additive          Additive[]
+  reajustment       Reajustment[]
   propouse          Propouse?
 
   @@map("contracts")
@@ -192,7 +192,7 @@ model Contract_Service {
 model Services {
   id          Int      @id @default(autoincrement())
   description String
-  code        String
+  code        String?
   created     DateTime @default(now())
   updated     DateTime @updatedAt
 
@@ -269,7 +269,7 @@ model LogEntry {
   action    String
   quantity  Int
   timestamp DateTime      @default(now())
-  itemType  String // "uniform" or "product"
+  itemType  String
   itemId    Int
   userId    Int
   unit      String
@@ -283,28 +283,43 @@ model LogEntry {
 }
 
 model Reajustment {
-  id            Int       @id @default(autoincrement())
-  contract_id   Int       @unique
-  valueContract Int
+  id            Int        @id @default(autoincrement())
+  contract_id   Int?
+  valueContract Decimal    @db.Decimal(8, 2)
   index         Float
-  created       DateTime  @default(now())
-  updated       DateTime  @updatedAt
-  Contracts     Contracts @relation(fields: [contract_id], references: [id])
+  type          String
+  created       DateTime   @default(now())
+  updated       DateTime   @updatedAt
+  Contracts     Contracts? @relation(fields: [contract_id], references: [id])
 
   @@map("reajustment")
 }
 
 model Additive {
   id               Int                @id @default(autoincrement())
-  contract_id      Int                @unique
-  newValue         Int
-  oldValue         Int
+  contract_id      Int?
+  d4sign           String?            @unique
+  newValue         Decimal            @db.Decimal(8, 2)
+  oldValue         Decimal            @db.Decimal(8, 2)
   created          DateTime           @default(now())
   updated          DateTime           @updatedAt
-  Contracts        Contracts          @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  Contracts        Contracts?         @relation(fields: [contract_id], references: [id], onDelete: Cascade)
   additive_Clauses Additive_Clauses[]
+  propouse         PropouseAdditive?
 
   @@map("additive")
+}
+
+model PropouseAdditive {
+  id          Int      @id @default(autoincrement())
+  file        Bytes    @db.LongBlob
+  fileName    String
+  additive_id Int      @unique
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+  Additive    Additive @relation(fields: [additive_id], references: [id], onDelete: Cascade)
+
+  @@map("propouse_additive")
 }
 
 model Additive_Clauses {

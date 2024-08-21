@@ -1,17 +1,17 @@
-import { Contracts, Services } from "@prisma/client";
+import { Additive, Reajustment } from "@prisma/client";
 import prisma from "../database/prisma";
 
-type ServicesUpdateInput = Partial<
-  Omit<Services, "id" | "created" | "updated">
+type ReajustmentUpdateInput = Partial<
+  Omit<Reajustment, "id" | "created" | "updated">
 >;
 
 type ContractUpdateInput = Partial<
-  Omit<Contracts, "id" | "created" | "updated">
+  Omit<Additive, "id" | "created" | "updated">
 >;
 
 interface ClauseInput {
   id: number;
-  contract_id: number;
+  additive_id: number;
   description: string;
 }
 
@@ -28,163 +28,120 @@ interface ContractServiceInput {
 }
 
 class AdditiveOrReajustmentService {
-  async createAdditive(contractId: number, newValue: number, oldValue: number, clauses: ClauseInput[]) {
-    const userAlreadyExists = await prisma.contracts.findFirst({
+  async createAdditive(
+    contractId: number,
+    newValue: string,
+    oldValue: string,
+    clauses: ClauseInput[]
+  ) {
+    const contractExists = await prisma.contracts.findFirst({
       where: { id: contractId },
     });
 
-    if (userAlreadyExists) {
-      throw new Error("Contrato já existe!");
+    if (!contractExists) {
+      throw new Error("Contrato não encontrado!");
     }
 
     const user = await prisma.additive.create({
-      data: { contract_id: contractId, newValue: newValue, oldValue: oldValue, additive_Clauses: {
-        create: clauses.map(({ description }) => ({
-          description,
-        })), },
-      }
+      data: {
+        contract_id: contractId,
+        newValue: newValue,
+        oldValue: oldValue,
+        additive_Clauses: {
+          create: clauses.map(({ description }) => ({
+            description,
+          })),
+        },
+      },
     });
 
     return user;
   }
   async deleteAdditive(id: number) {
-    const user = await prisma.contracts.delete({
-      where: { id },
+    const deletedAdditive = await prisma.$transaction(async (prisma) => {
+      await prisma.additive_Clauses.deleteMany({
+        where: { additive_id: id },
+      });
+  
+      await prisma.propouseAdditive.deleteMany({
+        where: { additive_id: id },
+      });
+  
+      const deletedAdditive = await prisma.additive.delete({
+        where: { id },
+      });
+  
+      return deletedAdditive;
     });
-
-    return user;
+  
+    return deletedAdditive;
   }
   async updateAdditive(
     id: number,
     updateData: ContractUpdateInput,
-    newServiceData: ContractServiceInput[],
-    newClauseData: ClauseInput[],
-    newSignData: SignInput[]
+    newClauseData: ClauseInput[]
   ) {
     const result = await prisma.$transaction(async (prisma) => {
-      const updatedContract = await prisma.contracts.update({
+      const updatedContract = await prisma.additive.update({
         where: { id: id },
         data: updateData,
       });
 
-      const existingSign = await prisma.signOnContract.findMany({
-        where: { contract_id: id },
+      const existingClauses = await prisma.additive_Clauses.findMany({
+        where: { additive_id: id },
       });
-
-      const existingServices = await prisma.contract_Service.findMany({
-        where: { contract_id: id },
-      });
-      const existingClauses = await prisma.clauses.findMany({
-        where: { contract_id: id },
-      });
-
-      const SignToDelete = existingSign.filter(
-        (ec) => !newSignData.some((nc) => nc.id === ec.id)
-      );
-      const SignDeletePromises = SignToDelete.map((sign) =>
-        prisma.signOnContract.delete({ where: { id: sign.id } })
-      );
-
-      const signCreateOrUpdatePromises = newSignData.map((signInput) => {
-        if (existingClauses.some((ec) => ec.id === signInput.id)) {
-          return prisma.signOnContract.update({
-            where: { id: signInput.id },
-            data: { sign_id: signInput.sign_id },
-          });
-        } else {
-          return prisma.signOnContract.create({
-            data: {
-              contract_id: id,
-              sign_id: signInput.sign_id,
-            },
-          });
-        }
-      });
-
-      const servicesToDelete = existingServices.filter(
-        (es) => !newServiceData.some((ns) => ns.contract_id === es.contract_id)
-      );
-      const serviceDeletePromises = servicesToDelete.map((service) =>
-        prisma.contract_Service.delete({ where: { id: service.id } })
-      );
-
-      const serviceCreateOrUpdatePromises = newServiceData.map(
-        async (serviceInput) => {
-          const existingService = existingServices.find(
-            (es) => es.id === serviceInput.id
-          );
-          if (existingService) {
-            return prisma.contract_Service.update({
-              where: { id: serviceInput.id },
-              data: { service_id: serviceInput.service_id },
-            });
-          } else {
-            return prisma.contract_Service.create({
-              data: {
-                contract_id: serviceInput.contract_id,
-                service_id: serviceInput.service_id,
-              },
-            });
-          }
-        }
-      );
 
       const clausesToDelete = existingClauses.filter(
         (ec) => !newClauseData.some((nc) => nc.id === ec.id)
       );
       const clauseDeletePromises = clausesToDelete.map((clause) =>
-        prisma.clauses.delete({ where: { id: clause.id } })
+        prisma.additive_Clauses.delete({ where: { id: clause.id } })
       );
 
       const clauseCreateOrUpdatePromises = newClauseData.map((clauseInput) => {
         if (existingClauses.some((ec) => ec.id === clauseInput.id)) {
-          return prisma.clauses.update({
+          return prisma.additive_Clauses.update({
             where: { id: clauseInput.id },
             data: { description: clauseInput.description },
           });
         } else {
-          return prisma.clauses.create({
+          return prisma.additive_Clauses.create({
             data: {
-              contract_id: id,
+              additive_id: id,
               description: clauseInput.description,
             },
           });
         }
       });
 
-      await Promise.all([...SignDeletePromises, ...SignDeletePromises]);
-      await Promise.all([...serviceDeletePromises, ...clauseDeletePromises]);
-      await Promise.all([
-        ...serviceCreateOrUpdatePromises,
-        ...clauseCreateOrUpdatePromises,
-      ]);
+      await Promise.all([...clauseDeletePromises]);
+      await Promise.all([...clauseCreateOrUpdatePromises]);
 
       return updatedContract;
     });
 
     return result;
   }
-  async createReajustment(contractId: number, valueContract: number, index: number) {
-    const userAlreadyExists = await prisma.reajustment.findFirst({
-      where: { contract_id: contractId },
-    });
-
-    if (userAlreadyExists) {
-      throw new Error("Contrato já existe!");
-    }
+  async createReajustment(
+    contractId: number,
+    valueContract: number,
+    index: number,
+    type: string
+  ) {
 
     const user = await prisma.reajustment.create({
       data: {
         contract_id: contractId,
         valueContract: valueContract,
-        index: index
+        index: index,
+        type: type,
       },
     });
 
     return user;
   }
   async deleteReajustment(id: number) {
-    const user = await prisma.contracts.delete({
+    const user = await prisma.reajustment.delete({
       where: { id },
     });
 
@@ -192,111 +149,12 @@ class AdditiveOrReajustmentService {
   }
   async updateReajustment(
     id: number,
-    updateData: ContractUpdateInput,
-    newServiceData: ContractServiceInput[],
-    newClauseData: ClauseInput[],
-    newSignData: SignInput[]
+    updateData: ReajustmentUpdateInput,
   ) {
-    const result = await prisma.$transaction(async (prisma) => {
-      const updatedContract = await prisma.contracts.update({
-        where: { id: id },
-        data: updateData,
-      });
-
-      const existingSign = await prisma.signOnContract.findMany({
-        where: { contract_id: id },
-      });
-
-      const existingServices = await prisma.contract_Service.findMany({
-        where: { contract_id: id },
-      });
-      const existingClauses = await prisma.clauses.findMany({
-        where: { contract_id: id },
-      });
-
-      const SignToDelete = existingSign.filter(
-        (ec) => !newSignData.some((nc) => nc.id === ec.id)
-      );
-      const SignDeletePromises = SignToDelete.map((sign) =>
-        prisma.signOnContract.delete({ where: { id: sign.id } })
-      );
-
-      const signCreateOrUpdatePromises = newSignData.map((signInput) => {
-        if (existingClauses.some((ec) => ec.id === signInput.id)) {
-          return prisma.signOnContract.update({
-            where: { id: signInput.id },
-            data: { sign_id: signInput.sign_id },
-          });
-        } else {
-          return prisma.signOnContract.create({
-            data: {
-              contract_id: id,
-              sign_id: signInput.sign_id,
-            },
-          });
-        }
-      });
-
-      const servicesToDelete = existingServices.filter(
-        (es) => !newServiceData.some((ns) => ns.contract_id === es.contract_id)
-      );
-      const serviceDeletePromises = servicesToDelete.map((service) =>
-        prisma.contract_Service.delete({ where: { id: service.id } })
-      );
-
-      const serviceCreateOrUpdatePromises = newServiceData.map(
-        async (serviceInput) => {
-          const existingService = existingServices.find(
-            (es) => es.id === serviceInput.id
-          );
-          if (existingService) {
-            return prisma.contract_Service.update({
-              where: { id: serviceInput.id },
-              data: { service_id: serviceInput.service_id },
-            });
-          } else {
-            return prisma.contract_Service.create({
-              data: {
-                contract_id: serviceInput.contract_id,
-                service_id: serviceInput.service_id,
-              },
-            });
-          }
-        }
-      );
-
-      const clausesToDelete = existingClauses.filter(
-        (ec) => !newClauseData.some((nc) => nc.id === ec.id)
-      );
-      const clauseDeletePromises = clausesToDelete.map((clause) =>
-        prisma.clauses.delete({ where: { id: clause.id } })
-      );
-
-      const clauseCreateOrUpdatePromises = newClauseData.map((clauseInput) => {
-        if (existingClauses.some((ec) => ec.id === clauseInput.id)) {
-          return prisma.clauses.update({
-            where: { id: clauseInput.id },
-            data: { description: clauseInput.description },
-          });
-        } else {
-          return prisma.clauses.create({
-            data: {
-              contract_id: id,
-              description: clauseInput.description,
-            },
-          });
-        }
-      });
-
-      await Promise.all([...SignDeletePromises, ...SignDeletePromises]);
-      await Promise.all([...serviceDeletePromises, ...clauseDeletePromises]);
-      await Promise.all([
-        ...serviceCreateOrUpdatePromises,
-        ...clauseCreateOrUpdatePromises,
-      ]);
-
-      return updatedContract;
-    });
+    const result = await prisma.reajustment.update({
+      where: {id: id},
+      data: updateData
+    })
 
     return result;
   }
