@@ -125,9 +125,9 @@ model Redirects {
 }
 
 model Contracts {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   status         String
-  d4sign         String?  @unique
+  d4sign         String?   @unique
   name           String
   cpfcnpj        String
   cep            String
@@ -137,12 +137,12 @@ model Contracts {
   neighborhood   String
   city           String
   state          String
-  contractNumber String
-  date           DateTime
-  value          Decimal  @db.Decimal(8, 2)
-  index          String
-  created        DateTime @default(now())
-  updated        DateTime @updatedAt
+  contractNumber String?
+  date           DateTime?
+  value          Decimal?  @db.Decimal(8, 2)
+  index          String?
+  created        DateTime  @default(now())
+  updated        DateTime  @updatedAt
 
   signOnContract    SignOnContract[]
   contracts_Service Contract_Service[]

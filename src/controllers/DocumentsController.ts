@@ -158,6 +158,21 @@ class DocumentsController {
     }
   }
 
+  async createCustomer(req: Request, res: Response) {
+    try {
+      const data = req.body;
+
+      const contract = await DocumentsService.createCustomer(data);
+
+      return res
+        .status(201)
+        .json({ contract, message: "Cliente criado com sucesso!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error });
+    }
+  }
+
   async deleteContract(req: Request, res: Response) {
     try {
       const contractId = parseInt(req.params.id);
@@ -270,9 +285,10 @@ class DocumentsController {
 
   async getContracts(req: Request, res: Response) {
     try {
-      const { type } = req.query;
+      const { name, type } = req.query;
 
       const listContracts = await DocumentsService.getContracts(
+        name?.toString(),
         type?.toString()
       );
 
