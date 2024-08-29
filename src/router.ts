@@ -71,6 +71,7 @@ routes.delete("/service/:id", DocumentsController.deleteService);
 routes.put("/service/:id", DocumentsController.updateService);
 
 routes.post("/contract", DocumentsController.createContract);
+routes.post("/customer", DocumentsController.createCustomer);
 routes.get("/contracts", DocumentsController.getContracts);
 routes.get("/contract/:id", DocumentsController.getById);
 routes.get("/contractInfo/:id", DocumentsController.getByIdAllInfo);

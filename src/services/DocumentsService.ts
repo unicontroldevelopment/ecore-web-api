@@ -9,6 +9,20 @@ type ContractUpdateInput = Partial<
   Omit<Contracts, "id" | "created" | "updated">
 >;
 
+type CustomerInput = {
+  status: string;
+  d4sign?: string | null;
+  name: string;
+  cpfcnpj: string;
+  cep: string;
+  road: string;
+  number: string;
+  complement?: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
+};
+
 interface ClauseInput {
   id: number;
   contract_id: number;
@@ -149,12 +163,15 @@ class DocumentsService {
 
     return user;
   }
-  async getContracts(type?: string) {
+  async getContracts(name?: string, type?: string) {
     const users = await prisma.contracts.findMany({
       where: {
         name: {
-          contains: type ? type : "",
+          contains: name ? name : "",
         },
+        status: {
+          equals: type
+        }
       },
       orderBy: {
         created: "desc",
@@ -256,6 +273,15 @@ class DocumentsService {
 
     return user;
   }
+
+  async createCustomer(data: CustomerInput) {
+    const user = await prisma.contracts.create({
+      data: data,
+    });
+
+    return user;
+  }
+
   async deleteContract(id: number) {
     const user = await prisma.contracts.delete({
       where: { id },
