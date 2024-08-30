@@ -160,9 +160,11 @@ class DocumentsController {
 
   async createCustomer(req: Request, res: Response) {
     try {
-      const data = req.body;
+      const {signOnContract, ...data} = req.body;
 
-      const contract = await DocumentsService.createCustomer(data);
+      const signNumber = parseInt(signOnContract, 10);
+
+      const contract = await DocumentsService.createCustomer(data, signNumber);
 
       return res
         .status(201)
