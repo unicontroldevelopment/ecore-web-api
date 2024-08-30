@@ -274,9 +274,15 @@ class DocumentsService {
     return user;
   }
 
-  async createCustomer(data: CustomerInput) {
+  async createCustomer(data: CustomerInput, signNumber: number,) {
     const user = await prisma.contracts.create({
-      data: data,
+      data: { ...data,
+        signOnContract: {
+          create: {
+            sign_id: signNumber,
+          },
+        },
+      },
     });
 
     return user;
