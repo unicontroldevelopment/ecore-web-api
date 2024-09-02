@@ -264,6 +264,68 @@ export const cadastrarDocumento = (req: Request, res: Response): void => {
   }
 };
 
+export const cadastrarAditivo = (req: Request, res: Response): void => {
+  const { name, file, contractId } = req.body;
+
+  const contractInt = parseInt(contractId);
+
+  try {
+
+    const base64File = file.replace(/^data:application\/pdf;base64,/, '');
+    const fileBuffer = Buffer.from(base64File, 'base64');
+
+    if (fileBuffer.length > 50 * 1024 * 1024) {
+      res.status(413).json({ message: "File size exceeds limit" });
+      return;
+    }
+
+    const options = {
+      method: "POST",
+      url: `https://${process.env.D4SIGN_AMBIENTE_TESTE}.d4sign.com.br/api/v1/documents/${process.env.ID_COFRE}/uploadbinary?tokenAPI=${process.env.D4SIGN_API_TOKEN}&cryptKey=${process.env.D4SIGN_CRYPT_KEY}`,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: {
+        base64_binary_file: base64File,
+        mime_type: "application/pdf",
+        name: name,
+      },
+      json: true,
+    };
+
+    request(options, async (error, response, body) => {
+      if (error) throw new Error(error);
+
+      const id_doc = body.uuid;
+
+      try {
+        await prisma.additive.update({
+          where: {
+            id: contractInt,
+          },
+          data: {
+            d4sign: id_doc,
+          },
+        });
+        return res.status(200).json({
+          message: "Aditivo cadastrado com sucesso",
+          d4sign: id_doc,
+        });
+      } catch (dbError) {
+        console.error("Error updating contract in database:", dbError);
+        return res.status(500).json({
+          message: "Error updating contract in database",
+          error: dbError,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Internal Error", error });
+  }
+};
+
 // Cancelar Documentos no D4Sign
 // Parametros recebidos:
 // comment: (opcional)	Insira um comentário sobre o cancelamento.
@@ -320,6 +382,57 @@ export const cancelarDocumento = (req: Request, res: Response): void => {
   });
 };
 
+export const cancelarAditivo = (req: Request, res: Response): void => {
+  const { id_doc, comment } = req.body;
+
+  const options = {
+    method: "POST",
+    url: `https://${process.env.D4SIGN_AMBIENTE_TESTE}.d4sign.com.br/api/v1/documents/${id_doc}/cancel?tokenAPI=${process.env.D4SIGN_API_TOKEN}&cryptKey=${process.env.D4SIGN_CRYPT_KEY}`,
+
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: { comment: comment },
+    json: true,
+  };
+
+  request(options, async (error, response, body) => {
+    try {
+      const contract = JSON.parse(body.statusName);
+      
+      await prisma.additive.update({
+        where: {
+          d4sign: id_doc,
+        },
+        data: {
+          d4sign: null,
+        },
+      });
+      
+      res
+        .status(200)
+        .json({
+          contract,
+          message: "Documento cancelado e referência removida do aditivo!",
+        });
+    } catch (parseError) {
+      await prisma.additive.update({
+        where: {
+          d4sign: id_doc,
+        },
+        data: {
+          d4sign: null,
+        },
+      });
+
+      res
+        .status(500)
+        .json({
+          message: "Erro ao processar resposta do D4Sign",
+          error: parseError,
+        });
+    }
+  });
+};
+
 // Buscar Documentos de um cofre ou pasta especifica no D4Sign
 
 // Função para buscar documentos do cofre
@@ -327,6 +440,21 @@ export const buscarDocumentosDoCofre = (req: Request, res: Response): void => {
   const options = {
     method: "GET",
     url: `https://${process.env.D4SIGN_AMBIENTE_TESTE}.d4sign.com.br/api/v1/documents/${process.env.ID_COFRE}/safe?tokenAPI=${process.env.D4SIGN_API_TOKEN}&cryptKey=${process.env.D4SIGN_CRYPT_KEY}`,
+
+    headers: { Accept: "application/json" },
+  };
+
+  request(options, (error, response, body) => {
+    if (error) throw new Error(error);
+    res.send(body);
+  });
+};
+
+// Função para buscar documentos do cofre
+export const buscarDocumentosDoCofreAditivo = (req: Request, res: Response): void => {
+  const options = {
+    method: "GET",
+    url: `https://${process.env.D4SIGN_AMBIENTE_TESTE}.d4sign.com.br/api/v1/documents/${process.env.ID_COFRE}/safe/${process.env.ID_PASTA_ADITIVO}?tokenAPI=${process.env.D4SIGN_API_TOKEN}&cryptKey=${process.env.D4SIGN_CRYPT_KEY}`,
 
     headers: { Accept: "application/json" },
   };
@@ -376,6 +504,7 @@ export const buscarDocumentosDoCofrePorId = (
     }
   });
 };
+
 
 // Download de um documento especifico
 // Parametros recebidos:
