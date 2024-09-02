@@ -11,9 +11,12 @@ import UniformController from "./controllers/UniformController";
 import authMiddlewares from "./middlewares/auth";
 import {
   buscarDocumentosDoCofre,
+  buscarDocumentosDoCofreAditivo,
   buscarDocumentosDoCofrePorId,
+  cadastrarAditivo,
   cadastrarAssinaturaNoDocumento,
   cadastrarDocumento,
+  cancelarAditivo,
   cancelarDocumento,
   downloadDeDocumento,
   enviarDocumentoParaAssinar,
@@ -101,8 +104,11 @@ routes.put("/contractSign/:id", ContractSignatureController.update);
 routes.get("/listarTodosOsDocumentos", listarDocumentos);
 routes.post("/enviarDocumentoParaAssinar", enviarDocumentoParaAssinar);
 routes.post("/cadastrarDocumento", upload.none(), cadastrarDocumento);
+routes.post("/cadastrarAditivo", upload.none(), cadastrarAditivo);
 routes.post("/cancelarDocumento", cancelarDocumento);
+routes.post("/cancelarAditivo", cancelarAditivo);
 routes.get("/buscarDocumentosDoCofre", buscarDocumentosDoCofre);
+routes.get("/buscarDocumentosDoCofreAditivo", buscarDocumentosDoCofreAditivo);
 routes.get("/buscarDocumentosDoCofrePorId", buscarDocumentosDoCofrePorId);
 routes.post("/downloadDeDocumento", downloadDeDocumento);
 routes.post("/listarSignatariosDeDocumento", listarSignatariosDeDocumento);

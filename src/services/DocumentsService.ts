@@ -130,6 +130,7 @@ class DocumentsService {
           select: {
             id: true,
             created: true,
+            d4sign: true,
             contract_id: true,
             oldValue: true,
             newValue: true,
@@ -289,11 +290,27 @@ class DocumentsService {
   }
 
   async deleteContract(id: number) {
-    const user = await prisma.contracts.delete({
-      where: { id },
+    const deletedContract = await prisma.$transaction(async (prisma) => {
+      await prisma.propouse.deleteMany({
+        where: { contract_id: id },
+      });
+  
+      await prisma.clauses.deleteMany({
+        where: { contract_id: id },
+      });
+  
+      await prisma.contract_Service.deleteMany({
+        where: { contract_id: id },
+      });
+  
+      const deletedContract = await prisma.contracts.delete({
+        where: { id },
+      });
+  
+      return deletedContract;
     });
-
-    return user;
+  
+    return deletedContract;
   }
   async updateContract(
     id: number,
