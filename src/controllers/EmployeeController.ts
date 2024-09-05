@@ -243,7 +243,7 @@ class EmployeeController {
         rg,
         cep,
         road,
-        intoInt(number),
+        number,
         complement,
         neighborhood,
         city,
@@ -324,6 +324,19 @@ class EmployeeController {
       }
 
       const updateData = await req.body;
+
+      if (updateData.initialWage) {
+        updateData.initialWage = parseFloat(
+          updateData.initialWage.replace(/\./g, "").replace(",", ".")
+        );
+      }
+
+      if (updateData.currentWage) {
+        updateData.currentWage = parseFloat(
+          updateData.currentWage.replace(/\./g, "").replace(",", ".")
+        );
+      }
+
 
       const updatedUser = await EmployeeService.update(userId, updateData);
 

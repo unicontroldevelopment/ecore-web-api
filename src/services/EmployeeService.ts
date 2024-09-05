@@ -212,7 +212,7 @@ class EmployeeService {
     rg: string,
     cep: string,
     road: string,
-    number: number,
+    number: string,
     complement: string,
     neighborhood: string,
     city: string,
