@@ -26,7 +26,7 @@ model Employees {
   rg              String?
   cep             String?
   road            String?
-  number          Int?
+  number          String?
   complement      String?
   neighborhood    String?
   city            String?
