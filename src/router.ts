@@ -28,6 +28,7 @@ import {
 } from "./services/D4SignService";
 import {
   buscaCep,
+  buscaHorasTrabalhadasRH,
   converteValorExtensoHandler,
   updateAdditivePdf,
   updatePdf,
@@ -135,5 +136,6 @@ routes.post("/upload", upload.single("file"), uploadPdf);
 routes.put("/updatePDF", upload.single("file"), updatePdf);
 routes.post("/uploadAdditive", upload.single("file"), uploadAdditivePdf);
 routes.put("/updateAdditivePDF", upload.single("file"), updateAdditivePdf);
+routes.post("/buscaHorasTrabalhadasRH", buscaHorasTrabalhadasRH);
 
 export default routes;
