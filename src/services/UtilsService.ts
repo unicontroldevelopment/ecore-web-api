@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
+import { QueryError, RowDataPacket } from "mysql2";
+import { db_agc } from "../database/db_agc";
 import prisma from "../database/prisma";
+
 const busca_cep = require("busca-cep");
 
 const numero_extenso = require("numero-por-extenso");
@@ -143,3 +146,17 @@ export const updateAdditivePdf = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export const buscaHorasTrabalhadasRH = async (req: Request, res: Response) => {
+  const { date_ini, date_fim } = req.body;
+
+  let SQL = `SELECT l.cod_lau,l.cod_cli,l.ini_lau,l.fim_lau,l.cod_fun,a.nom_adm,c.razao_social FROM laudo AS l,administrador AS a,cliente AS c WHERE l.fim_lau BETWEEN '${date_ini}-01' AND '${date_fim}-31' AND l.cod_cli IN(40233,81344,30290,40442,40440,14492,492,41366,60070,82734,82379) AND a.cod_adm = l.cod_fun AND l.cod_cli = c.cod_cli and l.ini_lau is not null and l.fim_lau is not null UNION ALL SELECT lr.cod_lau,lr.cli_lau,lr.hora_inicio,lr.hora_fim,lr.fun_lau,a.nom_adm,c.razao_social FROM laudo_reservatorio AS lr,administrador AS a,cliente AS c WHERE lr.dat_lau BETWEEN '${date_ini}-01' AND '${date_fim}-31' AND lr.cli_lau IN(40233,81344,30290,40442,40440,14492,492,41366,60070,82734,82379) AND a.cod_adm = lr.fun_lau AND c.cod_cli = lr.cli_lau and lr.hora_inicio is not null and lr.hora_fim is not null ORDER BY nom_adm ASC, ini_lau DESC`;
+  db_agc.query(SQL, (err: QueryError | null, result: RowDataPacket[] | null) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send({ error: "Erro ao buscar horas trabalhadas." });
+    } else {
+      res.send(result);
+    }
+  });
+};
