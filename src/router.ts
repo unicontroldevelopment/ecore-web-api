@@ -5,9 +5,11 @@ import ContractSignatureController from "./controllers/ContractSignatureControll
 import DocumentsController from "./controllers/DocumentsController";
 import EmailController from "./controllers/EmailController";
 import EmployeeController from "./controllers/EmployeeController";
+import FileController from "./controllers/FileController";
 import ProductController from "./controllers/ProductController";
 import ServerAccessController from "./controllers/ServerAccessController";
 import UniformController from "./controllers/UniformController";
+import UtilsController from "./controllers/UtilsController";
 import authMiddlewares from "./middlewares/auth";
 import {
   buscarDocumentosDoCofre,
@@ -26,15 +28,6 @@ import {
   reenviarDocumentoParaAssinar,
   removerAssinaturaDoDocumento,
 } from "./services/D4SignService";
-import {
-  buscaCep,
-  buscaHorasTrabalhadasRH,
-  converteValorExtensoHandler,
-  updateAdditivePdf,
-  updatePdf,
-  uploadAdditivePdf,
-  uploadPdf,
-} from "./services/UtilsService";
 
 const app = express();
 const routes = Router();
@@ -130,12 +123,13 @@ routes.get("/uniform/:id", UniformController.getById);
 routes.delete("/uniform/:id", UniformController.delete);
 routes.put("/uniform/:id", UniformController.update);
 
-routes.post("/valueExtensible", converteValorExtensoHandler);
-routes.post("/cep", buscaCep);
-routes.post("/upload", upload.single("file"), uploadPdf);
-routes.put("/updatePDF", upload.single("file"), updatePdf);
-routes.post("/uploadAdditive", upload.single("file"), uploadAdditivePdf);
-routes.put("/updateAdditivePDF", upload.single("file"), updateAdditivePdf);
-routes.post("/buscaHorasTrabalhadasRH", buscaHorasTrabalhadasRH);
+routes.post("/upload", upload.single("file"), FileController.uploadPdf);
+routes.put("/updatePDF", upload.single("file"), FileController.updatePdf);
+routes.post("/uploadAdditive", upload.single("file"), FileController.uploadAdditivePdf);
+routes.put("/updateAdditivePDF", upload.single("file"), FileController.updateAdditivePdf);
+
+routes.post("/valueExtensible", UtilsController.converteValorExtensoHandler);
+routes.post("/cep", UtilsController.buscaCep);
+routes.post("/buscaHorasTrabalhadasRH", UtilsController.buscaHorasTrabalhadasRH);
 
 export default routes;

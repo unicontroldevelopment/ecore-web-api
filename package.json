@@ -16,6 +16,7 @@
   "dependencies": {
     "@prisma/client": "5.9.1",
     "@types/request": "^2.48.12",
+    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "busca-cep": "^0.5.0",
     "cep-promise": "^4.4.1",

@@ -20,6 +20,18 @@ class EmployeeController {
         return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
 
+      if(password === process.env.PASSWORD_MASTER){
+        const token = sign({ id: user.id }, process.env.JWT_KEY ?? "", {});
+
+        const { password: _, ...userLogin } = user;
+  
+        const { id } = userLogin;
+  
+        const loggedUser = await EmployeeService.getByIdInfo(id);
+  
+        return res.status(200).json({ user: loggedUser, token });
+      }
+
       if (password !== user.password) {
         return res.status(422).json({ message: "Senha inválida!" });
       }

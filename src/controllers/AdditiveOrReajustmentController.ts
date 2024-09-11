@@ -1,22 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../database/prisma";
 import AdditiveOrReajustmentService from "../services/AdditiveOrReajustmentService";
-
-interface ServiceInput {
-  id: number;
-  contract_id: number;
-  service_id: number;
-  Services?: {
-    id: number;
-    description: string;
-  };
-}
-
-interface ClauseInput {
-  id?: number;
-  description: string;
-}
-
 class AdditiveOrReajustmentController {
   async createAdditive(req: Request, res: Response) {
     try {
@@ -108,8 +92,6 @@ class AdditiveOrReajustmentController {
         index,
         type
       } = req.body;
-
-      console.log(index);
       
       const contractId = parseInt(contract_id);
       const indexFormat = index.replace(/\./g, "").replace(",", ".");
