@@ -352,3 +352,28 @@ model EmployeesInfoRoles {
   @@id([employeeId, roleId])
   @@map("employeesInfoRoles")
 }
+
+model Form {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  published   Boolean  @default(false)
+  name        String
+  description String   @default("")
+  content     String   @db.Text
+
+  visits      Int @default(0)
+  submissions Int @default(0)
+
+  shareUrl        String            @unique @default(uuid())
+  FormSubmissions FormSubmissions[]
+}
+
+model FormSubmissions {
+  id        Int      @id @default(autoincrement())
+  sendBy    String
+  createdAt DateTime @default(now())
+  formId    Int
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  content String @db.LongText
+}
