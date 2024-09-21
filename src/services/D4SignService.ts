@@ -251,9 +251,9 @@ export const cadastrarDocumento = (req: Request, res: Response): void => {
           d4sign: id_doc,
         });
       } catch (dbError) {
-        console.error("Error updating contract in database:", dbError);
+        console.error("Erro ao atualizar o contrato no banco:", dbError);
         return res.status(500).json({
-          message: "Error updating contract in database",
+          message: "Erro ao atualizar o contrato no banco",
           error: dbError,
         });
       }
@@ -275,7 +275,7 @@ export const cadastrarAditivo = (req: Request, res: Response): void => {
     const fileBuffer = Buffer.from(base64File, 'base64');
 
     if (fileBuffer.length > 50 * 1024 * 1024) {
-      res.status(413).json({ message: "File size exceeds limit" });
+      res.status(413).json({ message: "Tamanho do arquivo excedeu o limite." });
       return;
     }
 
@@ -313,9 +313,9 @@ export const cadastrarAditivo = (req: Request, res: Response): void => {
           d4sign: id_doc,
         });
       } catch (dbError) {
-        console.error("Error updating contract in database:", dbError);
+        console.error("Erro ao atualizar o aditivo no banco:", dbError);
         return res.status(500).json({
-          message: "Error updating contract in database",
+          message: "Erro ao atualizar o aditivo no banco",
           error: dbError,
         });
       }

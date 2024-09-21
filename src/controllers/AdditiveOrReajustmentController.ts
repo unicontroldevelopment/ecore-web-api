@@ -40,14 +40,14 @@ class AdditiveOrReajustmentController {
       });
 
       if (!existedContract) {
-        return res.status(500).json({ message: "Reajuste não encontrado!" });
+        return res.status(500).json({ message: "Aditivo não encontrado!" });
       }
 
       const contract = await AdditiveOrReajustmentService.deleteAdditive(contractId);
 
       return res
         .status(200)
-        .json({ contract, message: "Reajuste deletado com sucesso!" });
+        .json({ contract, message: "Aditivo deletado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -108,7 +108,7 @@ class AdditiveOrReajustmentController {
 
       return res
         .status(201)
-        .json({ contract, message: "Aditivo criado com sucesso!" });
+        .json({ contract, message: "Reajuste criado com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error });
