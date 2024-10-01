@@ -68,7 +68,7 @@ routes.get("/form/:id", FormController.getById);
 routes.get("/formSubmissions/:id", FormController.getSubmissions);
 routes.get("/formUrl/:id", FormController.getByUrl)
 routes.delete("/form/:id", FormController.delete);
-routes.put("/form/:id", EmailController.update);
+routes.put("/form/:id", FormController.updateProperties);
 routes.put("/formContent/:id", FormController.updateContent);
 routes.put("/publishForm/:id", FormController.publishForm); 
 routes.put("/submitForm/:id", FormController.submitForm); 
