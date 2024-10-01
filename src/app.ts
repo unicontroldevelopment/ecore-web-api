@@ -18,7 +18,7 @@ app.use(routes);
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
+  console.log(`Servidor rodando no http://localhost:${PORT}`)
 );
 
 export default app;

@@ -47,12 +47,12 @@ class ContractSignatureController {
         });
   
         if (!existedUser) {
-          return res.status(500).json({ message: "Funcionário não encontrado!" });
+          return res.status(500).json({ message: "Assinatura não encontrada!" });
         }
   
         const user = await ContractSignatureService.getById(userId);
   
-        return res.status(200).json({ user, message: "Funcionário encontrado." });
+        return res.status(200).json({ user, message: "Assinatura encontrada." });
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server Internal Error", error });
@@ -68,14 +68,14 @@ class ContractSignatureController {
         });
   
         if (!existedUser) {
-          return res.status(500).json({ message: "Funcionário não encontrado!" });
+          return res.status(500).json({ message: "Assinatura não encontrada!" });
         }
   
         const user = await ContractSignatureService.delete(userId);
   
         return res
           .status(200)
-          .json({ user, message: "Funcionário deletado com sucesso!" });
+          .json({ user, message: "Assinatura deletada com sucesso!" });
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server Internal Error", error });
@@ -91,7 +91,7 @@ class ContractSignatureController {
         });
   
         if (!existedUser) {
-          return res.status(500).json({ message: "Funcionário não encontrado!" });
+          return res.status(500).json({ message: "Assinatura não encontrada!" });
         }
   
         const updateData = await req.body;
@@ -100,7 +100,7 @@ class ContractSignatureController {
   
         return res
           .status(200)
-          .json({ updatedUser, message: "Funcionário atualizado com sucesso!" });
+          .json({ updatedUser, message: "Assinatura atualizada com sucesso!" });
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server Internal Error", error });
@@ -114,12 +114,12 @@ class ContractSignatureController {
         );
   
         if (!listUsers) {
-          return res.status(500).json({ message: "Não há funcionários!" });
+          return res.status(500).json({ message: "Não há assinaturas!" });
         }
   
         return res
           .status(200)
-          .json({ listUsers, message: "Funcionários listados com sucesso!" });
+          .json({ listUsers, message: "Assinaturas listadas com sucesso!" });
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server Internal Error", error });

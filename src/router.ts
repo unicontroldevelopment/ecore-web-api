@@ -6,11 +6,11 @@ import DocumentsController from "./controllers/DocumentsController";
 import EmailController from "./controllers/EmailController";
 import EmployeeController from "./controllers/EmployeeController";
 import FileController from "./controllers/FileController";
+import FormController from "./controllers/FormController";
 import ProductController from "./controllers/ProductController";
 import ServerAccessController from "./controllers/ServerAccessController";
 import UniformController from "./controllers/UniformController";
 import UtilsController from "./controllers/UtilsController";
-import authMiddlewares from "./middlewares/auth";
 import {
   buscarDocumentosDoCofre,
   buscarDocumentosDoCofreAditivo,
@@ -38,7 +38,7 @@ const upload = multer({
 });
 
 routes.post("/login", EmployeeController.login);
-routes.use(authMiddlewares);
+//routes.use(authMiddlewares);
 routes.post("/employee", EmployeeController.create);
 routes.get("/employees", EmployeeController.getAll);
 routes.get("/employee/:id", EmployeeController.getById);
@@ -61,6 +61,17 @@ routes.get("/emails", EmailController.getAll);
 routes.get("/email/:id", EmailController.getById);
 routes.delete("/email/:id", EmailController.delete);
 routes.put("/email/:id", EmailController.update);
+
+routes.post("/form", FormController.create);
+routes.get("/forms", FormController.getAll);
+routes.get("/form/:id", FormController.getById);
+routes.get("/formSubmissions/:id", FormController.getSubmissions);
+routes.get("/formUrl/:id", FormController.getByUrl)
+routes.delete("/form/:id", FormController.delete);
+routes.put("/form/:id", EmailController.update);
+routes.put("/formContent/:id", FormController.updateContent);
+routes.put("/publishForm/:id", FormController.publishForm); 
+routes.put("/submitForm/:id", FormController.submitForm); 
 
 routes.post("/service", DocumentsController.createService);
 routes.get("/services", DocumentsController.getServices);
