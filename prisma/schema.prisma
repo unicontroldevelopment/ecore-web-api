@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum FormType {
+  PPA
+  PPO
+  Public
+}
+
 model Employees {
   id              Int       @id @default(autoincrement())
   name            String
@@ -73,6 +79,7 @@ model EmployeesInfo {
   ServerAccess     ServerAccess[]
   logs             LogEntry[]
   role             EmployeesInfoRoles[]
+  forms            FormUser[]
 
   @@map("employeesinfo")
 }
@@ -359,12 +366,15 @@ model Form {
   published   Boolean  @default(false)
   name        String
   description String   @default("")
-  content     String   @db.Text
+  content     String   @db.LongText
 
   visits      Int @default(0)
   submissions Int @default(0)
 
   shareUrl        String            @unique @default(uuid())
+  type            FormType          @default(Public)
+  users           FormUser[]
+  emails          FormEmail[]
   FormSubmissions FormSubmissions[]
 }
 
@@ -376,4 +386,21 @@ model FormSubmissions {
   form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   content String @db.LongText
+}
+
+model FormUser {
+  id     Int           @id @default(autoincrement())
+  formId Int
+  userId Int
+  form   Form          @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user   EmployeesInfo @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, userId])
+}
+
+model FormEmail {
+  id     Int    @id @default(autoincrement())
+  email  String
+  formId Int
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
 }
