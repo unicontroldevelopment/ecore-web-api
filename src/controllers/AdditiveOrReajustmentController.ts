@@ -66,7 +66,7 @@ class AdditiveOrReajustmentController {
         return res.status(500).json({ message: "Aditivo não encontrado!" });
       }
 
-      const {additive_Clauses, id, contract_id, ...updateData} = await req.body;
+      const {additive_Clauses, id, contract_id, d4SignData, ...updateData} = await req.body;
 
       if(updateData.newValue && updateData.oldValue) {
         updateData.newValue = parseFloat(updateData.newValue.replace(/\./g, '').replace(',', '.')).toString();
