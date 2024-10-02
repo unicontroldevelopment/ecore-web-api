@@ -157,6 +157,7 @@ class DocumentsService {
             created: true,
             valueContract: true,
             index: true,
+            text: true,
           },
         },
       },

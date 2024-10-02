@@ -126,7 +126,8 @@ class AdditiveOrReajustmentService {
     contractId: number,
     valueContract: number,
     index: number,
-    type: string
+    type: string,
+    text: string
   ) {
 
     const user = await prisma.reajustment.create({
@@ -135,6 +136,7 @@ class AdditiveOrReajustmentService {
         valueContract: valueContract,
         index: index,
         type: type,
+        text: text,
       },
     });
 

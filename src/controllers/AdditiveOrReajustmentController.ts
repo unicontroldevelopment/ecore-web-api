@@ -90,7 +90,8 @@ class AdditiveOrReajustmentController {
         contract_id,
         value,
         index,
-        type
+        type,
+        text
       } = req.body;
       
       const contractId = parseInt(contract_id);
@@ -103,7 +104,8 @@ class AdditiveOrReajustmentController {
         contractId,
         valueFormat,
         indexInt,
-        type
+        type,
+        text
       );
 
       return res
@@ -155,15 +157,15 @@ class AdditiveOrReajustmentController {
       const {index, contract_id, value, id, ...data } = updateData;
       let floatIndex: number;
       let floatValue: number;
-      
-      if (index.includes(",")) {
+
+      if (index.toString().includes(",")) {
         const indexFormat = index.replace(/\./g, "").replace(",", ".");
         floatIndex = parseFloat(indexFormat);
       } else {
         floatIndex = parseFloat(index);
       }
       
-      if (value.includes(",")) {
+      if (value.toString().includes(",")) {
         const valueFormat = value.replace(/\./g, "").replace(",", ".");
         floatValue = parseFloat(valueFormat);
       } else {
