@@ -295,6 +295,7 @@ model Reajustment {
   valueContract Decimal    @db.Decimal(8, 2)
   index         Float
   type          String
+  text          String?
   created       DateTime   @default(now())
   updated       DateTime   @updatedAt
   Contracts     Contracts? @relation(fields: [contract_id], references: [id])
