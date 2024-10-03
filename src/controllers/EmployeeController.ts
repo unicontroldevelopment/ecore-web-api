@@ -337,6 +337,10 @@ class EmployeeController {
 
       const updateData = await req.body;
 
+      if(updateData.cbo) {
+        updateData.cbo = parseInt(updateData.cbo);
+      }
+
       if (updateData.initialWage) {
         updateData.initialWage = parseFloat(
           updateData.initialWage.replace(/\./g, "").replace(",", ".")
