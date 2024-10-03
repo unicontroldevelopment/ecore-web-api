@@ -146,7 +146,7 @@ class FormController {
       if (!existedForm) {
         return res.status(500).json({ message: "Formulário não encontrado!" });
       }
-
+      
       const { name, description, type, users, emails } = await req.body;
 
       const form = await FormService.updateProperties(formId, {
@@ -262,10 +262,6 @@ class FormController {
         })
         .filter((field: any) => field !== null);
 
-      console.log(contentData);
-      console.log(mappedSubmission);
-      console.log(existedForm.emails);
-
       const renderContent = (content: any) => {
         return content
           .map((field: any) => {
@@ -310,7 +306,7 @@ class FormController {
                 }
                 return `
                 <p><strong>${field.label}:</strong>
-                <img src="${emoji}" alt="Emoji" /></p>`
+                <img src="${emoji}" alt="Emoji" /></p>`;
               default:
                 return `<p><strong>${field.label}:</strong> ${
                   field.value || "Sem dados"
@@ -320,7 +316,6 @@ class FormController {
           .join("");
       };
 
-      // Envio do e-mail
       const transporter = nodemailer.createTransport({
         host: "mail.unicontrol.net.br",
         port: 465,
@@ -331,26 +326,42 @@ class FormController {
         },
       });
 
-      const mailOptions = {
-        from: "informatica@unicontrol.net.br",
-        to: `${existedForm.emails[0].email}`,
-        subject: `Novo envio no formulário ${existedForm.name}`,
-        html: `
-          <div style="width: 75%; background-color: white; padding: 24px;">
-            <h1 style="font-size: 24px; font-weight: bold;">Novo Envio de Formulário</h1>
-            <p>Enviado por: ${name}</p>
-            <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-              ${renderContent(mappedSubmission)}
-            </div>
-          </div>
-        `,
-      };
+      console.log(existedForm.emails);
+      
 
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log("E-mail enviado com sucesso.");
-      } catch (error) {
-        console.error("Erro ao enviar o e-mail:", error);
+      if (existedForm.emails && existedForm.emails.length > 0) {
+        const recipients = existedForm.emails
+          .map((emailObj) => emailObj.email)
+          .filter((email) => email)
+          .join(',');
+      
+        if (recipients) {
+          const mailOptions = {
+            from: "informatica@unicontrol.net.br",
+            to: recipients,
+            subject: `Novo envio no formulário ${existedForm.name}`,
+            html: `
+              <div style="width: 75%; background-color: white; padding: 24px;">
+                <h1 style="font-size: 24px; font-weight: bold;">Novo Envio de Formulário</h1>
+                <p>Enviado por: ${name}</p>
+                <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                  ${renderContent(mappedSubmission)}
+                </div>
+              </div>
+            `,
+          };
+      
+          try {
+            await transporter.sendMail(mailOptions);
+            console.log("E-mail enviado com sucesso.");
+          } catch (error) {
+            console.error("Erro ao enviar o e-mail:", error);
+          }
+        } else {
+          console.log("Nenhum e-mail válido encontrado.");
+        }
+      } else {
+        console.log("Nenhum e-mail no formulário.");
       }
 
       return res
