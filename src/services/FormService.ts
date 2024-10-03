@@ -43,8 +43,6 @@ class FormService {
     return form;
   }
   async getAllForms(type: FormType, userId?: number) {
-    console.log(userId);
-    
     if (userId) {
       return await prisma.form.findMany({
         where: {

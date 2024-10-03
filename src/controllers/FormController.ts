@@ -1,5 +1,6 @@
 import { FormType } from "@prisma/client";
 import { Request, Response } from "express";
+import path from "path";
 import prisma from "../database/prisma";
 import EmailService from "../services/EmailService";
 import FormService from "../services/FormService";
@@ -8,9 +9,9 @@ const nodemailer = require("nodemailer");
 type FieldType = "DateField" | "CheckboxField" | "SelectField" | "EmojiField";
 
 interface Field {
-  type: FieldType; // Tipo do campo
-  value: string; // Valor do campo
-  label: string; // Rótulo para exibir no e-mail
+  type: FieldType;
+  value: string;
+  label: string;
 }
 
 type Content = Field[];
@@ -228,9 +229,9 @@ class FormController {
           emails: {
             select: {
               email: true,
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       if (!existedForm) {
@@ -261,11 +262,9 @@ class FormController {
         })
         .filter((field: any) => field !== null);
 
-        console.log(contentData);
-        console.log(mappedSubmission);
-        console.log(existedForm.emails);
-        
-
+      console.log(contentData);
+      console.log(mappedSubmission);
+      console.log(existedForm.emails);
 
       const renderContent = (content: any) => {
         return content
@@ -294,19 +293,24 @@ class FormController {
               case "EmojiField":
                 let emoji;
                 switch (field.value) {
-                  case "happy":
-                    emoji = "😃";
+                  case "good":
+                    emoji = path.join(__dirname, "../assets/emojis/happy.png");
                     break;
                   case "neutral":
-                    emoji = "😐";
+                    emoji = path.join(
+                      __dirname,
+                      "../assets/emojis/neutral.png"
+                    );
                     break;
                   case "sad":
-                    emoji = "😢";
+                    emoji = path.join(__dirname, "../assets/emojis/sad.png");
                     break;
                   default:
                     emoji = "Sem emoji selecionado";
                 }
-                return `<p><strong>${field.label}:</strong> ${emoji}</p>`;
+                return `
+                <p><strong>${field.label}:</strong>
+                <img src="${emoji}" alt="Emoji" /></p>`
               default:
                 return `<p><strong>${field.label}:</strong> ${
                   field.value || "Sem dados"
@@ -336,9 +340,7 @@ class FormController {
             <h1 style="font-size: 24px; font-weight: bold;">Novo Envio de Formulário</h1>
             <p>Enviado por: ${name}</p>
             <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-              ${renderContent(
-                mappedSubmission
-              )} <!-- Agora mapeia os valores corretos -->
+              ${renderContent(mappedSubmission)}
             </div>
           </div>
         `,
@@ -365,6 +367,8 @@ class FormController {
       const { formId, type } = req.query;
 
       const intId = formId ? parseInt(formId.toString(), 10) : undefined;
+
+      console.log("ID", formId);
 
       const listForms = await FormService.getAllForms(
         type?.toString() as FormType,
