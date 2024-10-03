@@ -43,6 +43,8 @@ class FormService {
     return form;
   }
   async getAllForms(type: FormType, userId?: number) {
+    console.log(userId);
+    
     if (userId) {
       return await prisma.form.findMany({
         where: {
@@ -189,6 +191,7 @@ class FormService {
     return user;
   }
   async submitForm(url: string, content: string, name: string) {
+
     const form = await prisma.form.update({
       data: {
         submissions: {
@@ -197,7 +200,7 @@ class FormService {
         FormSubmissions: {
           create: {
             sendBy: name,
-            content,
+            content
           },
         },
       },
@@ -206,40 +209,6 @@ class FormService {
         published: true,
       },
     });
-
-    const transporter = nodemailer.createTransport({
-      host: "mail.unicontrol.net.br",
-      port: 465,
-      secure: true,
-      auth: {
-        user: "informatica@unicontrol.net.br",
-        pass: "Uni197Canoas",
-      },
-    });
-
-    //<img src />
-
-    const mailOptions = {
-      from: "informatica@unicontrol.net.br",
-      to: "guilherme@unicontrol.com.br",
-      subject: "Novo Envio de Formulário",
-      html: `
-      <div style="width: 75%; background-color: white; padding: 24px;">
-        <h1 style="font-size: 24px; font-weight: bold;">Novo Envio de Formulário</h1>
-        <p>Enviado por: ${name}</p>
-        <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-          Conteudo
-        </div>
-      </div>
-    `,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log("E-mail enviado com sucesso.");
-    } catch (error) {
-      console.error("Erro ao enviar o e-mail:", error);
-    }
 
     return form;
   }
