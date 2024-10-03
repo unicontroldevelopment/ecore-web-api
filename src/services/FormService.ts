@@ -123,6 +123,7 @@ class FormService {
   }
   async updateProperties(id: number, formData: { name: string; description: string; type: FormType; users: number[]; emails: string[] }) {
     const { name, description, type, users, emails } = formData;
+
   
     const updatedForm = await prisma.$transaction(async (prisma) => {
       const form = await prisma.form.update({
@@ -144,6 +145,10 @@ class FormService {
             userId,
           })),
         });
+      } else {
+        await prisma.formUser.deleteMany({
+          where: { formId: id },
+        });
       }
   
       if (emails && emails.length > 0) {
@@ -155,6 +160,10 @@ class FormService {
             formId: id,
             email,
           })),
+        });
+      } else {
+        await prisma.formEmail.deleteMany({
+          where: { formId: id },
         });
       }
   
