@@ -141,6 +141,8 @@ routes.put("/updateAdditivePDF", upload.single("file"), FileController.updateAdd
 
 routes.post("/valueExtensible", UtilsController.converteValorExtensoHandler);
 routes.post("/cep", UtilsController.buscaCep);
+
 routes.post("/buscaHorasTrabalhadasRH", UtilsController.buscaHorasTrabalhadasRH);
+routes.get("/buscaInsumos", UtilsController.buscaInsumos);
 
 export default routes;

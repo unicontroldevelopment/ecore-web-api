@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import {
-    buscaCepService,
-    buscaHorasTrabalhadasRHService,
-    converteValorExtenso,
+  buscaCepService,
+  buscaHorasTrabalhadasRHService,
+  buscaInsumosService,
+  converteValorExtenso,
 } from "../services/UtilsService";
 
 class UtilsController {
@@ -16,6 +17,17 @@ class UtilsController {
       res
         .status(500)
         .json({ message: "Erro ao buscar horas trabalhadas", error });
+    }
+  }
+
+  async buscaInsumos(req: Request, res: Response) {
+    try {
+      const result = await buscaInsumosService();
+      res.json(result);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao buscar insumos", error });
     }
   }
   async converteValorExtensoHandler(req: Request, res: Response) {
