@@ -14,9 +14,9 @@ export const buscaCepService = async (cep: string) => {
 export const converteValorExtenso = (valor: string): string => {
   const valorConvertido = numero_extenso.porExtenso(
     valor.split(".").join("").split(",").join("."),
-    numero_extenso.estilo.monetario 
+    numero_extenso.estilo.monetario
   );
-  
+
   return valorConvertido;
 };
 
@@ -41,16 +41,40 @@ export const buscaHorasTrabalhadasRHService = (
       AND lr.hora_inicio IS NOT NULL AND lr.hora_fim IS NOT NULL
       ORDER BY nom_adm ASC, ini_lau DESC`;
 
-    db_agc.query(SQL, (err: QueryError | null, result: RowDataPacket[] | null) => {
-      if (err) {
-        return reject(err);
-      }
-      
-      if (!result) {
-        return reject(new Error("Nenhum resultado encontrado."));
-      }
+    db_agc.query(
+      SQL,
+      (err: QueryError | null, result: RowDataPacket[] | null) => {
+        if (err) {
+          return reject(err);
+        }
 
-      resolve(result);
-    });
+        if (!result) {
+          return reject(new Error("Nenhum resultado encontrado."));
+        }
+
+        resolve(result);
+      }
+    );
+  });
+};
+
+export const buscaInsumosService = (): Promise<RowDataPacket[]> => {
+  return new Promise((resolve, reject) => {
+    let SQL = `SELECT * FROM insumo WHERE ocultar = 0`;
+
+    db_agc.query(
+      SQL,
+      (err: QueryError | null, result: RowDataPacket[] | null) => {
+        if (err) {
+          return reject(err);
+        }
+
+        if (!result) {
+          return reject(new Error("Nenhum resultado encontrado."));
+        }
+
+        resolve(result);
+      }
+    );
   });
 };
