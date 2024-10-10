@@ -321,13 +321,10 @@ class FormController {
         port: 465,
         secure: true,
         auth: {
-          user: "informatica@unicontrol.net.br",
-          pass: "Uni197Canoas",
+          user: "formularios@unicontrol.net.br",
+          pass: "Uni1001Canoas",
         },
-      });
-
-      console.log(existedForm.emails);
-      
+      });   
 
       if (existedForm.emails && existedForm.emails.length > 0) {
         const recipients = existedForm.emails
@@ -337,7 +334,7 @@ class FormController {
       
         if (recipients) {
           const mailOptions = {
-            from: "informatica@unicontrol.net.br",
+            from: "formularios@unicontrol.net.br",
             to: recipients,
             subject: `Novo envio no formulário ${existedForm.name}`,
             html: `
