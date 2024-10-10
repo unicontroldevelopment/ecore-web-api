@@ -3,7 +3,6 @@ import { sign } from "jsonwebtoken";
 import prisma from "../database/prisma";
 import EmployeeService from "../services/EmployeeService";
 
-
 interface User {
   name: string;
 }
@@ -20,15 +19,15 @@ class EmployeeController {
         return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
 
-      if(password === process.env.PASSWORD_MASTER){
+      if (password === process.env.PASSWORD_MASTER) {
         const token = sign({ id: user.id }, process.env.JWT_KEY ?? "", {});
 
         const { password: _, ...userLogin } = user;
-  
+
         const { id } = userLogin;
-  
+
         const loggedUser = await EmployeeService.getByIdInfo(id);
-  
+
         return res.status(200).json({ user: loggedUser, token });
       }
 
@@ -45,6 +44,35 @@ class EmployeeController {
       const loggedUser = await EmployeeService.getByIdInfo(id);
 
       return res.status(200).json({ user: loggedUser, token });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Internal Error", error });
+    }
+  }
+
+  async changePasswrod(req: Request, res: Response) {
+    try {
+      const idInt = parseInt(req.params.id);
+      const { newPassword, currentPassword, confirmPassword } = req.body;
+      const existedUser = await prisma.employeesInfo.findUnique({
+        where: { id: idInt },
+      });
+
+      if(!existedUser){
+        return res.status(500).json({ message: "Funcionário não encontrado!" });
+      }
+
+      if (currentPassword!== existedUser.password) {
+        return res.status(422).json({ message: "Senha atual inválida!" });
+      }
+
+      if (newPassword!== confirmPassword) {
+        return res.status(422).json({ message: "Senhas não conferem!" });
+      }
+
+      const user = await EmployeeService.changePassword(idInt, newPassword)
+
+      return res.status(200).json({ user, message: "Senha atualizada com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
@@ -73,7 +101,7 @@ class EmployeeController {
         coolerProperty,
         officeVersion,
         windowsVersion,
-        employeeId
+        employeeId,
       } = req.body;
 
       const user = await EmployeeService.createInfo(
@@ -165,10 +193,14 @@ class EmployeeController {
       }
 
       const updateData = await req.body;
-      
-      const {role , ...restOfData} = updateData;
 
-      const updatedUser = await EmployeeService.updateInfo(userId, restOfData, role);
+      const { role, ...restOfData } = updateData;
+
+      const updatedUser = await EmployeeService.updateInfo(
+        userId,
+        restOfData,
+        role
+      );
 
       return res
         .status(200)
@@ -232,13 +264,13 @@ class EmployeeController {
         dateAdmission,
         dateResignation,
         initialWage,
-        currentWage
+        currentWage,
       } = req.body;
 
-      const intoInt = ((string: string) => {
+      const intoInt = (string: string) => {
         const stringInt = parseInt(string);
-        return stringInt
-      })
+        return stringInt;
+      };
 
       const user = await EmployeeService.create(
         name,
@@ -337,11 +369,11 @@ class EmployeeController {
 
       const updateData = await req.body;
 
-      if(updateData.cbo) {
+      if (updateData.cbo) {
         updateData.cbo = parseInt(updateData.cbo);
       }
       if (updateData.initialWage !== undefined) {
-        if (updateData.initialWage === '') {
+        if (updateData.initialWage === "") {
           updateData.initialWage = null;
         } else {
           updateData.initialWage = parseFloat(
@@ -349,9 +381,9 @@ class EmployeeController {
           );
         }
       }
-  
+
       if (updateData.currentWage !== undefined) {
-        if (updateData.currentWage === '') {
+        if (updateData.currentWage === "") {
           updateData.currentWage = null;
         } else {
           updateData.currentWage = parseFloat(
@@ -359,7 +391,6 @@ class EmployeeController {
           );
         }
       }
-
 
       const updatedUser = await EmployeeService.update(userId, updateData);
 
@@ -374,7 +405,7 @@ class EmployeeController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const { name, office } = req.query;  
+      const { name, office } = req.query;
 
       const listUsers = await EmployeeService.getAll(
         name?.toString(),
