@@ -232,7 +232,7 @@ class FormController {
             },
           },
         },
-      });
+      });    
 
       if (!existedForm) {
         return res.status(500).json({ message: "Formulário não encontrado!" });
@@ -340,7 +340,7 @@ class FormController {
             html: `
               <div style="width: 75%; background-color: white; padding: 24px;">
                 <h1 style="font-size: 24px; font-weight: bold;">Novo Envio de Formulário</h1>
-                <p>Enviado por: ${name}</p>
+                <p>${existedForm.type === "PPA" || "PPO" ? `Avaliação do(a) colaborador(a) ${name}` : `Enviado por: ${name}`}</p>
                 <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
                   ${renderContent(mappedSubmission)}
                 </div>
