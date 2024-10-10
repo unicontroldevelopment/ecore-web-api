@@ -44,6 +44,7 @@ routes.get("/employees", EmployeeController.getAll);
 routes.get("/employee/:id", EmployeeController.getById);
 routes.delete("/employee/:id", EmployeeController.delete);
 routes.put("/employee/:id", EmployeeController.update);
+routes.put("/employeePassword/:id", EmployeeController.changePasswrod);
 routes.post("/employeeInfo", EmployeeController.createInfo);
 routes.get("/employeesInfo", EmployeeController.getAllInfo);
 routes.get("/employeeInfo/:id", EmployeeController.getByIdInfo);

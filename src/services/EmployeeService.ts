@@ -312,6 +312,19 @@ class EmployeeService {
 
     return employees;
   }
+
+  async changePassword(id: number, newPassword: string) {
+    const user = await prisma.employeesInfo.update({
+      where: {
+        id: id,
+      },
+      data: {
+        password: newPassword,
+      },
+    });
+
+    return user;
+  }
 }
 
 export default new EmployeeService();
