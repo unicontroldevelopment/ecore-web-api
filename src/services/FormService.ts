@@ -28,6 +28,7 @@ class FormService {
   async getByUrl(url: string) {
     const form = await prisma.form.update({
       select: {
+        type: true,
         content: true,
       },
       data: {
