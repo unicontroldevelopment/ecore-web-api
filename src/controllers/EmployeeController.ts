@@ -340,17 +340,24 @@ class EmployeeController {
       if(updateData.cbo) {
         updateData.cbo = parseInt(updateData.cbo);
       }
-
-      if (updateData.initialWage) {
-        updateData.initialWage = parseFloat(
-          updateData.initialWage.replace(/\./g, "").replace(",", ".")
-        );
+      if (updateData.initialWage !== undefined) {
+        if (updateData.initialWage === '') {
+          updateData.initialWage = null;
+        } else {
+          updateData.initialWage = parseFloat(
+            updateData.initialWage.replace(/\./g, "").replace(",", ".")
+          );
+        }
       }
-
-      if (updateData.currentWage) {
-        updateData.currentWage = parseFloat(
-          updateData.currentWage.replace(/\./g, "").replace(",", ".")
-        );
+  
+      if (updateData.currentWage !== undefined) {
+        if (updateData.currentWage === '') {
+          updateData.currentWage = null;
+        } else {
+          updateData.currentWage = parseFloat(
+            updateData.currentWage.replace(/\./g, "").replace(",", ".")
+          );
+        }
       }
 
 
