@@ -321,8 +321,8 @@ class FormController {
         port: 465,
         secure: true,
         auth: {
-          user: "formularios@unicontrol.net.br",
-          pass: "Uni1001Canoas",
+          user: process.env.LOGIN_FORMS,
+          pass: process.env.PASSWORD_FORMS,
         },
       });   
 
