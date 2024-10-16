@@ -223,8 +223,8 @@ class EmployeeService {
     costCenter: string,
     dateAdmission: string,
     dateResignation: string,
-    initialWage: string,
-    currentWage: string
+    initialWage: number | null,
+    currentWage: number | null
   ) {
 
     const userAlreadyExists = await prisma.employees.findUnique({

@@ -13,6 +13,7 @@ datasource db {
 enum FormType {
   PPA
   PPO
+  PPC
   Public
 }
 
@@ -295,7 +296,7 @@ model Reajustment {
   valueContract Decimal    @db.Decimal(8, 2)
   index         Float
   type          String
-  text          String?
+  text          String?    @db.LongText
   created       DateTime   @default(now())
   updated       DateTime   @updatedAt
   Contracts     Contracts? @relation(fields: [contract_id], references: [id])
