@@ -376,8 +376,6 @@ class FormController {
 
       const intId = formId ? parseInt(formId.toString(), 10) : undefined;
 
-      console.log("ID", formId);
-
       const listForms = await FormService.getAllForms(
         type?.toString() as FormType,
         intId

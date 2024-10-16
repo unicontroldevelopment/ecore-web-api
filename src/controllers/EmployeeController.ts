@@ -272,6 +272,29 @@ class EmployeeController {
         return stringInt;
       };
 
+      let initialWageFloat: number | null = null;
+      let currentWageFloat: number | null = null;
+      
+      if (initialWage !== undefined && initialWage !== null) {
+        if (initialWage === "") {
+          initialWageFloat = null;
+        } else {
+          initialWageFloat = parseFloat(
+            String(initialWage).replace(/\./g, "").replace(",", ".")
+          );
+        }
+      }
+      
+      if (currentWage !== undefined && currentWage !== null) {
+        if (currentWage === "") {
+          currentWageFloat = null;
+        } else {
+          currentWageFloat = parseFloat(
+            String(currentWage).replace(/\./g, "").replace(",", ".")
+          );
+        }
+      }
+
       const user = await EmployeeService.create(
         name,
         birthday,
@@ -298,8 +321,8 @@ class EmployeeController {
         costCenter,
         dateAdmission,
         dateResignation,
-        initialWage,
-        currentWage
+        initialWageFloat,
+        currentWageFloat,
       );
 
       return res
