@@ -188,10 +188,10 @@ model Propouse {
 model Contract_Service {
   id          Int       @id @default(autoincrement())
   contract_id Int
-  service_id  Int
+  service_id  Int?
   created     DateTime  @default(now())
   updated     DateTime  @updatedAt
-  Services    Services  @relation(fields: [service_id], references: [id])
+  Services    Services? @relation(fields: [service_id], references: [id], onDelete: SetNull)
   Contracts   Contracts @relation(fields: [contract_id], references: [id], onDelete: Cascade)
 
   @@map("contract_service")
