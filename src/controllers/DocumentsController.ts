@@ -306,6 +306,26 @@ class DocumentsController {
       return res.status(500).json({ message: "Server Internal Error", error });
     }
   }
+
+  async getDashboardStats(req: Request, res: Response) {
+    try {
+      const stats = await DocumentsService.getDashboardStats();
+      return res.status(200).json(stats);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  }
+
+  async getContractsByMonth(req: Request, res: Response) {
+    try {
+      const contractsByMonth = await DocumentsService.getContractsByMonth();
+      res.json(contractsByMonth);
+    } catch (error) {
+      console.error("Erro ao buscar contratos por mês:", error);
+      res.status(500).json({ message: "Erro interno ao processar a requisição." });
+    }
+  }
 }
 
 export default new DocumentsController();

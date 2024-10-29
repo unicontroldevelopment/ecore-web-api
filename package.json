@@ -30,6 +30,7 @@
     "nodemailer": "^6.9.15",
     "numero-por-extenso": "^1.0.8",
     "qs": "^6.11.2",
+    "react-medium-image-zoom": "^5.2.10",
     "request": "^2.88.2",
     "ts-node": "^10.9.2"
   },

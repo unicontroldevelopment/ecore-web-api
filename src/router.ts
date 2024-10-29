@@ -86,6 +86,8 @@ routes.get("/contract/:id", DocumentsController.getById);
 routes.get("/contractInfo/:id", DocumentsController.getByIdAllInfo);
 routes.delete("/contract/:id", DocumentsController.deleteContract);
 routes.put("/contract/:id", DocumentsController.updateContract);
+routes.get("/dashboard/contract-stats", DocumentsController.getDashboardStats);
+routes.get("/dashboard/monthly", DocumentsController.getContractsByMonth); 
 
 routes.post("/additive", AdditiveOrReajustmentController.createAdditive);
 routes.delete("/additive/:id", AdditiveOrReajustmentController.deleteAdditive);
@@ -145,5 +147,10 @@ routes.post("/cep", UtilsController.buscaCep);
 
 routes.post("/buscaHorasTrabalhadasRH", UtilsController.buscaHorasTrabalhadasRH);
 routes.get("/buscaInsumos", UtilsController.buscaInsumos);
+routes.get("/pedidos", UtilsController.buscarPedidos);
+routes.post("/buscar-produtos-pedido", UtilsController.buscarProdutosDoPedido);
+routes.put("/finalizar", UtilsController.alterarStatusPedidoFinalizado);
+routes.post("/alterarStatusComprado", UtilsController.alterarStatusPedidoComprado);
+routes.post("/alterarStatusCancelado", UtilsController.alterarStatusPedidoCancelado);
 
 export default routes;
