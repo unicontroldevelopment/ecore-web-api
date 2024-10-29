@@ -426,6 +426,61 @@ class DocumentsService {
 
     return result;
   }
+
+  async getDashboardStats() {
+    const totalEmployees = await prisma.employees.count();
+    const totalContracts = await prisma.contracts.count({
+      where: {
+        status: { equals: "Contrato" },
+      }
+    });
+    const contractsWithD4Sign = await prisma.contracts.count({
+      where: {
+        d4sign: {
+          not: null
+        }
+      }
+    });
+
+    return {
+      totalContracts,
+      contractsWithD4Sign,
+      totalEmployees
+    };
+  }
+
+  async getContractsByMonth() {
+    const currentYear = new Date().getFullYear();
+    const startDate = new Date(currentYear, 0, 1);
+    const endDate = new Date(currentYear + 1, 0, 1);
+  
+    const contracts = await prisma.contracts.findMany({
+      where: {
+        date: {
+          gte: startDate,
+          lt: endDate,
+        },
+        status: "Contrato",
+      },
+      select: {
+        date: true,
+      },
+    });
+  
+    const monthsData = Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      count: 0,
+    }));
+  
+    contracts.forEach((contract) => {
+      if (contract.date) {
+        const month = contract.date.getMonth();
+        monthsData[month].count++;
+      }
+    });
+  
+    return monthsData;
+  }
 }
 
 export default new DocumentsService();
