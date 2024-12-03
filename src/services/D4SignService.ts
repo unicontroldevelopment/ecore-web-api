@@ -236,6 +236,12 @@ export const cadastrarDocumento = (req: Request, res: Response): void => {
       if (error) throw new Error(error);
 
       const id_doc = body.uuid;
+      const message = body.message;
+
+      if(message === 'This account has no more limits to send documents'){
+        res.status(403).json({ message: "Limite de envio de documentos excedido." });
+        return;
+      }
 
       try {
         await prisma.contracts.update({
@@ -297,7 +303,13 @@ export const cadastrarAditivo = (req: Request, res: Response): void => {
     request(options, async (error, response, body) => {
       if (error) throw new Error(error);
 
-      const id_doc = body.uuid;
+      const id_doc = body.uuid; 
+      const message = body.message;
+
+      if(message === 'This account has no more limits to send documents'){
+        res.status(403).json({ message: "Limite de envio de documentos excedido." });
+        return;
+      }
 
       try {
         await prisma.additive.update({

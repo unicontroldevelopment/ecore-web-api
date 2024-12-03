@@ -5,7 +5,6 @@ import {
   alterarStatusPedidoFinalizado,
   buscaCepService,
   buscaHorasTrabalhadasRHService,
-  buscaInsumosService,
   buscarPedidosService,
   buscarProdutosDoPedidoService,
   converteValorExtenso,
@@ -22,15 +21,6 @@ class UtilsController {
       res
         .status(500)
         .json({ message: "Erro ao buscar horas trabalhadas", error });
-    }
-  }
-
-  async buscaInsumos(req: Request, res: Response) {
-    try {
-      const result = await buscaInsumosService();
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ message: "Erro ao buscar insumos", error });
     }
   }
   async converteValorExtensoHandler(req: Request, res: Response) {

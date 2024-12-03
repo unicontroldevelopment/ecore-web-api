@@ -14,6 +14,20 @@ export const savePdf = async (
   return savedFile;
 };
 
+export const savePdfDraft = async (
+  contractId: number,
+  file: Express.Multer.File
+) => {
+  const savedFile = await prisma.draftFile.create({
+    data: {
+      draft_id: contractId,
+      file: file.buffer,
+      fileName: file.originalname,
+    },
+  });
+  return savedFile;
+};
+
 export const saveAdditivePdf = async (
   additiveId: number,
   file: Express.Multer.File
@@ -27,6 +41,30 @@ export const saveAdditivePdf = async (
   });
   return savedFile;
 };
+
+export async function updatePdfDraft(draftId: number, file: Express.Multer.File) {
+  const existingFile = await prisma.draftFile.findFirst({
+    where: { draft_id: draftId }
+  });
+
+  if (existingFile) {
+    return prisma.draftFile.update({
+      where: { id: existingFile.id },
+      data: {
+        file: file.buffer,
+        fileName: file.originalname,
+      }
+    });
+  } else {
+    return prisma.draftFile.create({
+      data: {
+        draft_id: draftId,
+        file: file.buffer,
+        fileName: file.originalname,
+      }
+    });
+  }
+}
 
 export const updateOrCreatePdf = async (
   contractId: number,
