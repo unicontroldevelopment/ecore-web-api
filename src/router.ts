@@ -1,8 +1,10 @@
 import express, { Router } from "express";
 import multer from "multer";
 import AdditiveOrReajustmentController from "./controllers/AdditiveOrReajustmentController";
+import AGCController from "./controllers/AGCController";
 import ContractSignatureController from "./controllers/ContractSignatureController";
 import DocumentsController from "./controllers/DocumentsController";
+import DraftsController from "./controllers/DraftsController";
 import EmailController from "./controllers/EmailController";
 import EmployeeController from "./controllers/EmployeeController";
 import FileController from "./controllers/FileController";
@@ -146,11 +148,19 @@ routes.post("/valueExtensible", UtilsController.converteValorExtensoHandler);
 routes.post("/cep", UtilsController.buscaCep);
 
 routes.post("/buscaHorasTrabalhadasRH", UtilsController.buscaHorasTrabalhadasRH);
-routes.get("/buscaInsumos", UtilsController.buscaInsumos);
-routes.get("/pedidos", UtilsController.buscarPedidos);
 routes.post("/buscar-produtos-pedido", UtilsController.buscarProdutosDoPedido);
 routes.put("/finalizar", UtilsController.alterarStatusPedidoFinalizado);
 routes.post("/alterarStatusComprado", UtilsController.alterarStatusPedidoComprado);
 routes.post("/alterarStatusCancelado", UtilsController.alterarStatusPedidoCancelado);
+routes.get("/pedidos", UtilsController.buscarPedidos);
+
+routes.post("/drafts", upload.single("file"), DraftsController.createDraft);
+routes.get("/drafts/contract/:contractId", DraftsController.getDraftsByContractId);
+routes.get("/drafts/:id", DraftsController.getDraftById);
+routes.put("/drafts/:id", upload.single("file"), DraftsController.updateDraft);
+routes.delete("/drafts/:id", DraftsController.deleteDraft);
+
+routes.get("/buscaInsumos", AGCController.buscaInsumos);
+routes.get("/insumosMovimentacao", AGCController.buscarMovimentacoes);
 
 export default routes;
