@@ -4,12 +4,13 @@ import { savePdfDraft, updatePdfDraft } from "./FileService";
 class DraftsService {
   async createDraft(contractId: number, title: string, value: string, dateString: Date, file: Express.Multer.File) {
     const date = new Date(dateString);
+    const unformattedValue = value.replace(/[.,]/g, ''); // Remove commas and periods
     const draft = await prisma.drafts.create({
       data: {
         contractId,
         title,
         date,
-        value,
+        value: unformattedValue, // Store as unformatted string
       },
     });
 
@@ -34,11 +35,12 @@ class DraftsService {
 
   async updateDraft(id: number, title: string, value: string, dateString: Date, file?: Express.Multer.File) {
     const date = new Date(dateString);
+    const unformattedValue = value.replace(/[.,]/g, ''); // Remove commas and periods
     const updatedDraft = await prisma.drafts.update({
       where: { id },
       data: {
         title,
-        value,
+        value: unformattedValue, // Store as unformatted string
         date,
       },
       include: { DraftFile: true }
