@@ -416,8 +416,8 @@ model Drafts {
   date       DateTime
   created    DateTime    @default(now())
   updated    DateTime    @updatedAt
-  contract   Contracts?  @relation(fields: [contractId], references: [id], onDelete: SetNull)
-  draft_file DraftFile[]
+  Contracts  Contracts?  @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  DraftFile  DraftFile[]
 
   @@map("drafts")
 }
@@ -426,10 +426,10 @@ model DraftFile {
   id       Int      @id @default(autoincrement())
   file     Bytes    @db.LongBlob
   fileName String
-  draft_id Int      @unique
+  draftId  Int      @unique
   created  DateTime @default(now())
   updated  DateTime @updatedAt
-  draft    Drafts   @relation(fields: [draft_id], references: [id], onDelete: Cascade)
+  Drafts   Drafts   @relation(fields: [draftId], references: [id], onDelete: Cascade)
 
   @@map("draft_file")
 }
