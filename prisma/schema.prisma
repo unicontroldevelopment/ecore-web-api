@@ -416,8 +416,8 @@ model Drafts {
   date        DateTime
   created     DateTime    @default(now())
   updated     DateTime    @updatedAt
-  Contracts   Contracts?  @relation(fields: [contract_id], references: [id], onDelete: Cascade)
-  DraftFile   DraftFile[]
+  contract    Contracts?  @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  draft_file  DraftFile[]
 
   @@index([contract_id])
   @@map("drafts")
@@ -430,7 +430,7 @@ model DraftFile {
   draft_id Int      @unique
   created  DateTime @default(now())
   updated  DateTime @updatedAt
-  Drafts   Drafts   @relation(fields: [draft_id], references: [id], onDelete: Cascade)
+  draft    Drafts   @relation(fields: [draft_id], references: [id], onDelete: Cascade)
 
   @@map("draft_file")
 }
