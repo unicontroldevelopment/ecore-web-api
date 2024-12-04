@@ -409,17 +409,17 @@ model FormEmail {
 }
 
 model Drafts {
-  id          Int         @id @default(autoincrement())
-  contract_id Int
-  title       String
-  value       String
-  date        DateTime
-  created     DateTime    @default(now())
-  updated     DateTime    @updatedAt
-  contract    Contracts   @relation(fields: [contract_id], references: [id])
-  draft_file  DraftFile[]
+  id         Int         @id @default(autoincrement())
+  contractId Int?
+  title      String
+  value      String
+  date       DateTime
+  created    DateTime    @default(now())
+  updated    DateTime    @updatedAt
+  Contracts  Contracts?  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  DraftFile  DraftFile[]
 
-  @@index([contract_id])
+  @@index([contractId])
   @@map("drafts")
 }
 
@@ -430,7 +430,7 @@ model DraftFile {
   draft_id Int      @unique
   created  DateTime @default(now())
   updated  DateTime @updatedAt
-  draft    Drafts   @relation(fields: [draft_id], references: [id], onDelete: Cascade)
+  Drafts   Drafts   @relation(fields: [draft_id], references: [id], onDelete: Cascade)
 
   @@map("draft_file")
 }
