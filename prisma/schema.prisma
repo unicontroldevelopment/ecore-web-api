@@ -416,7 +416,7 @@ model Drafts {
   date        DateTime
   created     DateTime    @default(now())
   updated     DateTime    @updatedAt
-  contract    Contracts   @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  contract    Contracts   @relation(fields: [contract_id], references: [id])
   draft_file  DraftFile[]
 
   @@index([contract_id])
