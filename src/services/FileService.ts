@@ -20,7 +20,7 @@ export const savePdfDraft = async (
 ) => {
   const savedFile = await prisma.draftFile.create({
     data: {
-      draft_id: contractId,
+      draftId: contractId,
       file: file.buffer,
       fileName: file.originalname,
     },
@@ -44,7 +44,7 @@ export const saveAdditivePdf = async (
 
 export async function updatePdfDraft(draftId: number, file: Express.Multer.File) {
   const existingFile = await prisma.draftFile.findFirst({
-    where: { draft_id: draftId }
+    where: { draftId: draftId }
   });
 
   if (existingFile) {
@@ -58,7 +58,7 @@ export async function updatePdfDraft(draftId: number, file: Express.Multer.File)
   } else {
     return prisma.draftFile.create({
       data: {
-        draft_id: draftId,
+        draftId: draftId,
         file: file.buffer,
         fileName: file.originalname,
       }

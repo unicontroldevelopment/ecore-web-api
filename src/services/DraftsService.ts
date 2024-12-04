@@ -15,20 +15,20 @@ class DraftsService {
 
     const savedFile = await savePdfDraft(draft.id, file);
 
-    return { draft: { ...draft, draft_file: savedFile } };
+    return { draft: { ...draft, DraftFile: savedFile } };
   }
 
   async getDraftsByContractId(contractId: number) {
     return prisma.drafts.findMany({
       where: { contractId },
-      include: { draft_file: true }
+      include: { DraftFile: true }
     });
   }
 
   async getDraftById(id: number) {
     return prisma.drafts.findUnique({
       where: { id },
-      include: { draft_file: true }
+      include: { DraftFile: true }
     });
   }
 
@@ -41,12 +41,12 @@ class DraftsService {
         value,
         date,
       },
-      include: { draft_file: true }
+      include: { DraftFile: true }
     });
 
     if (file) {
       const savedFile = await updatePdfDraft(updatedDraft.id, file);
-      return { draft: { ...updatedDraft, draft_file: savedFile } };
+      return { draft: { ...updatedDraft, DraftFile: savedFile } };
     }
 
     return { draft: updatedDraft };
