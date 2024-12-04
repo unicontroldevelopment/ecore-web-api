@@ -2,11 +2,11 @@ import prisma from "../database/prisma";
 import { savePdfDraft, updatePdfDraft } from "./FileService";
 
 class DraftsService {
-  async createDraft(contract_id: number, title: string, value: string, dateString: Date, file: Express.Multer.File) {
+  async createDraft(contractId: number, title: string, value: string, dateString: Date, file: Express.Multer.File) {
     const date = new Date(dateString);
     const draft = await prisma.drafts.create({
       data: {
-        contract_id,
+        contractId,
         title,
         date,
         value,
@@ -18,9 +18,9 @@ class DraftsService {
     return { draft: { ...draft, draft_file: savedFile } };
   }
 
-  async getDraftsByContractId(contract_id: number) {
+  async getDraftsByContractId(contractId: number) {
     return prisma.drafts.findMany({
-      where: { contract_id },
+      where: { contractId },
       include: { draft_file: true }
     });
   }
