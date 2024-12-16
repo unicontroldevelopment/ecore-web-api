@@ -13,6 +13,7 @@ import ProductController from "./controllers/ProductController";
 import ServerAccessController from "./controllers/ServerAccessController";
 import UniformController from "./controllers/UniformController";
 import UtilsController from "./controllers/UtilsController";
+import authMiddlewares from "./middlewares/auth";
 import {
   buscarDocumentosDoCofre,
   buscarDocumentosDoCofreAditivo,
@@ -40,7 +41,7 @@ const upload = multer({
 });
 
 routes.post("/login", EmployeeController.login);
-//routes.use(authMiddlewares);
+routes.use(authMiddlewares);
 routes.post("/employee", EmployeeController.create);
 routes.get("/employees", EmployeeController.getAll);
 routes.get("/employee/:id", EmployeeController.getById);
@@ -52,6 +53,7 @@ routes.get("/employeesInfo", EmployeeController.getAllInfo);
 routes.get("/employeeInfo/:id", EmployeeController.getByIdInfo);
 routes.delete("/employeeInfo/:id", EmployeeController.deleteInfo);
 routes.put("/employeeInfo/:id", EmployeeController.updateInfo);
+routes.post("/resetPassword", EmployeeController.resetPassword);
 
 routes.post("/serverAccess", ServerAccessController.create);
 routes.get("/serverAccessGetAll", ServerAccessController.getAllUsers);
@@ -153,6 +155,7 @@ routes.put("/finalizar", UtilsController.alterarStatusPedidoFinalizado);
 routes.post("/alterarStatusComprado", UtilsController.alterarStatusPedidoComprado);
 routes.post("/alterarStatusCancelado", UtilsController.alterarStatusPedidoCancelado);
 routes.get("/pedidos", UtilsController.buscarPedidos);
+routes.post("/forgotPassword", UtilsController.forgotPassword);
 
 routes.post("/drafts", upload.single("file"), DraftsController.createDraft);
 routes.get("/drafts/contract/:contractId", DraftsController.getDraftsByContractId);
@@ -162,5 +165,6 @@ routes.delete("/drafts/:id", DraftsController.deleteDraft);
 
 routes.get("/buscaInsumos", AGCController.buscaInsumos);
 routes.get("/insumosMovimentacao", AGCController.buscarMovimentacoes);
+routes.get("/buscarProdutos", AGCController.buscarProdutos);
 
 export default routes;

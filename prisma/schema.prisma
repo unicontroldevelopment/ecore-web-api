@@ -74,6 +74,7 @@ model EmployeesInfo {
   officeVersion    String?
   windowsVersion   String?
   employeeId       Int
+  resetToken       String?
   created          DateTime             @default(now())
   updated          DateTime             @updatedAt
   Employees        Employees            @relation(fields: [employeeId], references: [id])

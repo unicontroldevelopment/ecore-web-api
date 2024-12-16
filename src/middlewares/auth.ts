@@ -34,6 +34,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       return next();
     }
   } catch (err) {
-    return res.status(404).json({ message: "User not authorized" });
+    return res.status(404).json({ message: "Usuário não autorizado!" });
   }
 };

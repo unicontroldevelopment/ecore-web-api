@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sign } from "jsonwebtoken";
+import jwt, { sign } from "jsonwebtoken";
 import prisma from "../database/prisma";
 import EmployeeService from "../services/EmployeeService";
 
@@ -58,25 +58,83 @@ class EmployeeController {
         where: { id: idInt },
       });
 
-      if(!existedUser){
+      if (!existedUser) {
         return res.status(500).json({ message: "Funcionário não encontrado!" });
       }
 
-      if (currentPassword!== existedUser.password) {
+      if (currentPassword !== existedUser.password) {
         return res.status(422).json({ message: "Senha atual inválida!" });
       }
 
-      if (newPassword!== confirmPassword) {
+      if (newPassword !== confirmPassword) {
         return res.status(422).json({ message: "Senhas não conferem!" });
       }
 
-      const user = await EmployeeService.changePassword(idInt, newPassword)
+      const user = await EmployeeService.changePassword(idInt, newPassword);
 
-      return res.status(200).json({ user, message: "Senha atualizada com sucesso!" });
+      return res
+        .status(200)
+        .json({ user, message: "Senha atualizada com sucesso!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Server Internal Error", error });
     }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Token e nova senha são obrigatórios." });
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        email: string;
+      };
+    } catch (error) {
+      
+      return res
+        .status(401)
+        .json({
+          message:
+            "Token inválido ou expirado. Solicite uma nova redefinição de senha.",
+        });
+    }
+
+    const existedUser = await prisma.employeesInfo.findUnique({
+      where: { email: decodedToken.email },
+    });
+
+    if (!existedUser) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+
+    if (existedUser.resetToken !== token) {
+      return res
+        .status(401)
+        .json({
+          message: "Token inválido. Solicite uma nova redefinição de senha.",
+        });
+    }
+
+    const user = await EmployeeService.resetPassword(
+      existedUser.id,
+      newPassword
+    );
+
+    // Clear the reset token after successful password reset
+    await prisma.employeesInfo.update({
+      where: { id: existedUser.id },
+      data: { resetToken: null },
+    });
+
+    return res
+      .status(200)
+      .json({ user, message: "Senha atualizada com sucesso!" });
   }
 
   async createInfo(req: Request, res: Response) {
@@ -274,7 +332,7 @@ class EmployeeController {
 
       let initialWageFloat: number | null = null;
       let currentWageFloat: number | null = null;
-      
+
       if (initialWage !== undefined && initialWage !== null) {
         if (initialWage === "") {
           initialWageFloat = null;
@@ -284,7 +342,7 @@ class EmployeeController {
           );
         }
       }
-      
+
       if (currentWage !== undefined && currentWage !== null) {
         if (currentWage === "") {
           currentWageFloat = null;
@@ -322,7 +380,7 @@ class EmployeeController {
         dateAdmission,
         dateResignation,
         initialWageFloat,
-        currentWageFloat,
+        currentWageFloat
       );
 
       return res
