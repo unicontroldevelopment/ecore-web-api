@@ -19,6 +19,16 @@ class AGCController {
           res.status(500).json({ error: "Erro ao buscar pedidos" });
         }
       }
+
+      async buscarProdutos (req: Request, res: Response): Promise<void> {
+        try {
+        const produtos = await AGCService.buscarProdutos();
+        res.json(produtos);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Erro ao buscar produtos" });
+        }
+      }
 }
 
 export default new AGCController();
